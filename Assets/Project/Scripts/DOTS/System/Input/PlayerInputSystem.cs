@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,6 +7,7 @@ namespace DOTS
 {
     // 必ず入力処理を使用するグループの最初に実行する
     [UpdateInGroup(typeof(InputUpdateGroup), OrderFirst = true)]
+    [BurstCompile]
     public partial class PlayerInputSystem : SystemBase
     {
         private PlayerInputAction inputActions;
@@ -13,6 +15,8 @@ namespace DOTS
         // 作成時に登録
         protected override void OnCreate()
         {
+            RequireForUpdate<PlayerInputComponent>();
+
             // アクションを登録する
             inputActions = new();
             inputActions.IngamePlayer.Move.performed += OnMove;
@@ -42,7 +46,7 @@ namespace DOTS
         {
             Vector2 direction = context.ReadValue<Vector2>();
 
-            Entities.ForEach((ref MovementComponent move) =>
+            Entities.ForEach((ref PlayerInputComponent move) =>
             {
                 move.MoveDirection = direction;
             }).Run();
@@ -53,11 +57,11 @@ namespace DOTS
         /// </summary>
         private void OnAvoid(InputAction.CallbackContext context)
         {
-            bool isAvoid = context.ReadValue<bool>();
+            bool isAvoid = context.ReadValue<float>() != 0;
 
-            Entities.ForEach((ref AvoidComponent avoid) =>
+            Entities.ForEach((ref PlayerInputComponent input) =>
             {
-                avoid.IsAvoidInput = isAvoid;
+                input.IsAvoidInput = isAvoid;
             }).Run();
         }
 

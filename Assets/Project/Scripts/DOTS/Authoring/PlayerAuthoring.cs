@@ -9,6 +9,12 @@ namespace Mono
     {
         [SerializeField]
         private float speed;    // プレイヤーの速度
+        [SerializeField]
+        private float rotationSpeed; // 回転の速度
+        [SerializeField]
+        private float avoidPower;   // 回避力
+        [SerializeField]
+        private float avoidingTime; // 回避が有効な時間
 
         private class PlayerBaker : Baker<PlayerAuthoring>
         {
@@ -17,10 +23,16 @@ namespace Mono
                 Entity player = GetEntity(TransformUsageFlags.None);
 
                 // プレイヤーにコンポーネントを追加
-                AddComponent(player, typeof(MovementComponent));
+                AddComponent(player, typeof(PlayerInputComponent));
                 AddComponent(player, new PlayerComponent
                 {
-                    Speed = authoring.speed
+                    Speed = authoring.speed,
+                    RotationSpeed = authoring.rotationSpeed,
+                });
+                AddComponent(player, new AvoidComponent
+                {
+                    AvoidPower = authoring.avoidPower,
+                    AvoidingTime = authoring.avoidingTime
                 });
             }
         }
