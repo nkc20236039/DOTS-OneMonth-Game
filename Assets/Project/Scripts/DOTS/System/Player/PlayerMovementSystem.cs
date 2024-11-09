@@ -18,14 +18,14 @@ namespace DOTS
         {
             state.RequireForUpdate<PhysicsVelocity>();
             state.RequireForUpdate<PlayerInputComponent>();
-            state.RequireForUpdate<PlayerComponent>();
+            state.RequireForUpdate<PlayerSingleton>();
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
             state.Dependency = new PlayerMovementJob
             {
-                Player = SystemAPI.GetSingleton<PlayerComponent>()
+                Player = SystemAPI.GetSingleton<PlayerSingleton>()
             }.ScheduleParallel(state.Dependency);
 
             state.Dependency.Complete();
@@ -38,7 +38,7 @@ namespace DOTS
     [BurstCompile]
     public partial struct PlayerMovementJob : IJobEntity
     {
-        [ReadOnly] public PlayerComponent Player;
+        [ReadOnly] public PlayerSingleton Player;
 
         private void Execute(
             ref LocalTransform transform,
@@ -60,6 +60,9 @@ namespace DOTS
                 = moveDirection
                 * Player.Speed;
 
+            // Y座標を0に固定
+            transform.Position.y = 0;
+
             // 移動をしていなければこれ以降の処理を実行しない
             // (入力を監視していてエンティティ全て処理が行われないことが確定しているためループを抜けてよい)
             if (math.distancesq(float3.zero, moveDirection) == 0) { return; }
@@ -79,9 +82,6 @@ namespace DOTS
 
             // 物理の回転を固定
             mass.InverseInertia = float3.zero;
-
-            // Y座標を0に固定
-            transform.Position.y = 0;
         }
     }
 }

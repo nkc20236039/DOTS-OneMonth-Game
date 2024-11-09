@@ -24,7 +24,7 @@ namespace Mono
 
                 // プレイヤーにコンポーネントを追加
                 AddComponent(player, typeof(PlayerInputComponent));
-                AddComponent(player, new PlayerComponent
+                AddComponent(player, new PlayerSingleton
                 {
                     Speed = authoring.speed,
                     RotationSpeed = authoring.rotationSpeed,

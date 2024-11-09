@@ -10,7 +10,7 @@ namespace DOTStoMono
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
             state.RequireForUpdate<VirtualPlayerManagedComponent>();
-            state.RequireForUpdate<PlayerComponent>();
+            state.RequireForUpdate<PlayerSingleton>();
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
@@ -20,7 +20,7 @@ namespace DOTStoMono
                 .GetSingleton<VirtualPlayerManagedComponent>();
 
             // DOTS側のプレイヤーを取得
-            var player = SystemAPI.GetSingletonEntity<PlayerComponent>();
+            var player = SystemAPI.GetSingletonEntity<PlayerSingleton>();
             var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
 
             // 位置を同期
