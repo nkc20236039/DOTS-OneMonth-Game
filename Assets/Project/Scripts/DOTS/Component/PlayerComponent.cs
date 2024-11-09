@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace DOTS
 {
@@ -6,5 +7,7 @@ namespace DOTS
     {
         public float Speed;
         public float RotationSpeed;
+
+        public float3 Position;
     }
 }

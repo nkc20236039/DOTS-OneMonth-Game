@@ -27,7 +27,7 @@ namespace DOTS
                 RefRW<PhysicsVelocity>,
                 RefRW<PhysicsMass>,
                 RefRO<PlayerInputComponent>,
-                RefRO<PlayerComponent>>())
+                RefRW<PlayerComponent>>())
             {
                 // Žó‚¯Žæ‚Á‚½“ü—Í‚ð•½–Ê‚Ö•ÏŠ·
                 float3 moveDirection = new

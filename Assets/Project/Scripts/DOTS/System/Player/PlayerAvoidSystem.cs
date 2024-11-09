@@ -1,7 +1,6 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Physics;
 
 namespace DOTS
 {
@@ -26,15 +25,16 @@ namespace DOTS
             {
                 if (avoid.ValueRO.IsAvoiding) { return; }
 
+                // ‰ñ”ğó‘Ô‚É‚·‚é
                 avoid.ValueRW.IsAvoiding = input.ValueRO.IsAvoidInput;
 
+                // •ûŒü‚ğw’è
                 float3 direction = new
                 (
                     input.ValueRO.MoveDirection.x,
                     0,
                     input.ValueRO.MoveDirection.y
                 );
-
                 avoid.ValueRW.AvoidDirection = direction;
             }
         }

@@ -22,7 +22,6 @@ namespace DOTS
             inputActions.IngamePlayer.Move.performed += OnMove;
             inputActions.IngamePlayer.Move.canceled += OnMove;
             inputActions.IngamePlayer.Avoid.started += OnAvoid;
-            inputActions.IngamePlayer.Avoid.canceled += OnAvoid;
             inputActions.Enable();
         }
 
@@ -34,7 +33,6 @@ namespace DOTS
             inputActions.IngamePlayer.Move.performed -= OnMove;
             inputActions.IngamePlayer.Move.canceled -= OnMove;
             inputActions.IngamePlayer.Avoid.started -= OnAvoid;
-            inputActions.IngamePlayer.Avoid.canceled -= OnAvoid;
             inputActions.Disable();
             inputActions.Dispose();
         }
