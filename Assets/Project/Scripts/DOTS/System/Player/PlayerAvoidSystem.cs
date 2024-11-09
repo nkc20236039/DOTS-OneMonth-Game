@@ -11,13 +11,13 @@ namespace DOTS
     [BurstCompile]
     public partial struct PlayerAvoidSystem : ISystem
     {
-        void ISystem.OnCreate(ref Unity.Entities.SystemState state)
+        void ISystem.OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<AvoidComponent>();
             state.RequireForUpdate<PlayerInputComponent>();
         }
 
-        void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
+        void ISystem.OnUpdate(ref SystemState state)
         {
             foreach ((var avoid, var input) in SystemAPI.Query<
                 RefRW<AvoidComponent>,

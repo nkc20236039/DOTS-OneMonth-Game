@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -22,48 +23,65 @@ namespace DOTS
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
-            foreach ((var transform, var velocity, var physicsMass, var move, var player) in SystemAPI.Query<
-                RefRW<LocalTransform>,
-                RefRW<PhysicsVelocity>,
-                RefRW<PhysicsMass>,
-                RefRO<PlayerInputComponent>,
-                RefRW<PlayerComponent>>())
+            state.Dependency = new PlayerMovementJob
             {
-                // 受け取った入力を平面へ変換
-                float3 moveDirection = new
+                Player = SystemAPI.GetSingleton<PlayerComponent>()
+            }.ScheduleParallel(state.Dependency);
+
+            state.Dependency.Complete();
+        }
+    }
+
+    /// <summary>
+    /// プレイヤー移動Job
+    /// </summary>
+    [BurstCompile]
+    public partial struct PlayerMovementJob : IJobEntity
+    {
+        [ReadOnly] public PlayerComponent Player;
+
+        private void Execute(
+            ref LocalTransform transform,
+            ref PhysicsVelocity velocity,
+            ref PhysicsMass mass,
+            in PlayerInputComponent playerInput)
+        {
+            // 受け取った入力を平面へ変換
+            float3 moveDirection = new
+            (
+                playerInput.MoveDirection.x,
+                0,
+                playerInput.MoveDirection.y
+            );
+            moveDirection = math.normalizesafe(moveDirection);
+
+            // 速度を適用
+            velocity.Linear
+                = moveDirection
+                * Player.Speed;
+
+            // 移動をしていなければこれ以降の処理を実行しない
+            // (入力を監視していてエンティティ全て処理が行われないことが確定しているためループを抜けてよい)
+            if (math.distancesq(float3.zero, moveDirection) == 0) { return; }
+
+            /*回転の計算*/
+            quaternion currentRotation = transform.Rotation;
+            quaternion lookRotation = quaternion.LookRotationSafe(moveDirection, math.up());
+
+            // スムーズに回転させる
+            transform.Rotation
+                = math.slerp
                 (
-                    move.ValueRO.MoveDirection.x,
-                    0,
-                    move.ValueRO.MoveDirection.y
+                    currentRotation,
+                    lookRotation,
+                    Player.RotationSpeed
                 );
-                moveDirection = math.normalizesafe(moveDirection);
 
-                // 速度を適用
-                velocity.ValueRW.Linear
-                    = moveDirection
-                    * player.ValueRO.Speed
-                    * SystemAPI.Time.DeltaTime;
+            // 物理の回転を固定
+            mass.InverseInertia = float3.zero;
 
-                // 移動をしていなければこれ以降の処理を実行しない
-                // (入力を監視していてエンティティ全て処理が行われないことが確定しているためループを抜けてよい)
-                if (math.distancesq(float3.zero, moveDirection) == 0) { return; }
-
-                /*回転の計算*/
-                quaternion currentRotation = transform.ValueRO.Rotation;
-                quaternion lookRotation = quaternion.LookRotationSafe(moveDirection, math.up());
-
-                // スムーズに回転させる
-                transform.ValueRW.Rotation
-                    = math.slerp
-                    (
-                        currentRotation,
-                        lookRotation,
-                        player.ValueRO.RotationSpeed * SystemAPI.Time.DeltaTime
-                    );
-
-                // 物理の回転を固定
-                physicsMass.ValueRW.InverseInertia = float3.zero;
-            }
+            // Y座標を0に固定
+            transform.Position.y = 0;
         }
     }
 }

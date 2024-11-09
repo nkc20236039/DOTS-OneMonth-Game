@@ -34,7 +34,7 @@ namespace DOTS
             if (!avoid.IsAvoiding) { return; }
 
             // ‰ñ”ð•ûŒü‚Ö—Í‚ð‰ÁŽZ
-            velocity.Linear += avoid.AvoidDirection * avoid.AvoidPower * DeltaTime;
+            velocity.Linear += avoid.AvoidDirection * avoid.AvoidPower;
             
             // ‰ñ”ðŽžŠÔ‚ÌŒvŽZ
             avoid.AvoidingElapsedTime += DeltaTime;

@@ -1,5 +1,6 @@
 using DOTS;
 using Unity.Entities;
+using Unity.Transforms;
 
 namespace DOTStoMono
 {
@@ -19,10 +20,11 @@ namespace DOTStoMono
                 .GetSingleton<VirtualPlayerManagedComponent>();
 
             // DOTS側のプレイヤーを取得
-            var player = SystemAPI.GetSingleton<PlayerComponent>();
+            var player = SystemAPI.GetSingletonEntity<PlayerComponent>();
+            var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
 
             // 位置を同期
-            virtualPlayer.VirtualPlayerTransform.position = player.Position;
+            virtualPlayer.VirtualPlayerTransform.position = playerTransform.Position;
         }
     }
 }
