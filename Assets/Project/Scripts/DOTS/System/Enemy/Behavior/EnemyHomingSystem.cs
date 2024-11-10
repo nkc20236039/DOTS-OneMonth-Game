@@ -46,6 +46,7 @@ namespace DOTS
 
             transform.Rotation = direction;
             velocity.Linear = transform.Forward() * enemy.Speed;
+            transform.Position.y = 0;
         }
     }
 }
