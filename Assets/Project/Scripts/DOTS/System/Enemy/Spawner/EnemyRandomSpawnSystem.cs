@@ -25,12 +25,19 @@ namespace DOTS
                 RefRW<EnemySpawnerComponent>,
                 RefRO<EnemyRandomSpawnComponent>>())
             {
-                var randomPosition
+                // ƒ‰ƒ“ƒ_ƒ€‚É•ûŒü‚ğŒˆ‚ß‚é
+                float3 randomRotation
                     = random.NextFloat3
                     (
-                        float3.zero,
-                        spawner.ValueRO.SpawnRadius * new float3(1, 0, 1)
+                        new float3(-1, 0, -1),
+                        new float3(1, 0, 1)
                     );
+                randomRotation = math.normalize(randomRotation);
+
+                // ƒ‰ƒ“ƒ_ƒ€‚É‹——£‚ğŒˆ‚ß‚é
+                float randomRadius = random.NextFloat(0, spawner.ValueRO.SpawnRadius);
+                // ‡¬
+                float3 randomPosition = randomRotation * randomRadius;
 
                 spawner.ValueRW.Position = randomSpawn.ValueRO.Origin + randomPosition;
             }
