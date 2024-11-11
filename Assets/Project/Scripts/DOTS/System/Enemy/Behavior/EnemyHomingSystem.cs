@@ -11,7 +11,12 @@ namespace DOTS
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
+            // 召喚する条件が整っているエンティティのみに処理
+            var requireQuery = SystemAPI.QueryBuilder()
+                .WithAll<EnemyHomingComponent, LocalTransform, PhysicsVelocity>()
+                .Build();
 
+            state.RequireForUpdate(requireQuery);
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
@@ -31,7 +36,7 @@ namespace DOTS
         public float3 PlayerPositon;
 
         private void Execute(
-            ref EnemyHomingComponent enemy,
+            in EnemyHomingComponent enemy,
             ref LocalTransform transform,
             ref PhysicsVelocity velocity)
         {
