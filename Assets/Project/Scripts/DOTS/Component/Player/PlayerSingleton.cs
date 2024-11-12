@@ -7,7 +7,5 @@ namespace DOTS
     {
         public float Speed;
         public float RotationSpeed;
-
-        public float3 Position;
     }
 }

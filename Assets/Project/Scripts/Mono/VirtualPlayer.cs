@@ -6,11 +6,11 @@ namespace DOTStoMono
 {
     public class VirtualPlayer : MonoBehaviour
     {
-        private VirtualPlayerManagedComponent virtualPlayerPosition;
+        private VirtualPlayerManagedSingleton virtualPlayerPosition;
 
         private void Start()
         {
-            virtualPlayerPosition = new VirtualPlayerManagedComponent
+            virtualPlayerPosition = new VirtualPlayerManagedSingleton
             {
                 VirtualPlayerTransform = transform
             };

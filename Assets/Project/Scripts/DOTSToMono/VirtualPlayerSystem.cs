@@ -1,23 +1,28 @@
 using DOTS;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Transforms;
 
 namespace DOTStoMono
 {
     [UpdateAfter(typeof(ActionUpdateGroup))]
-    public partial struct VirtualPlayerSystem : ISystem
+    public partial class VirtualPlayerSystem : SystemBase
     {
-        void ISystem.OnCreate(ref Unity.Entities.SystemState state)
+        private VirtualPlayerManagedSingleton virtualPlayer;
+        protected override void OnCreate()
         {
-            state.RequireForUpdate<VirtualPlayerManagedComponent>();
-            state.RequireForUpdate<PlayerSingleton>();
+            RequireForUpdate<VirtualPlayerManagedSingleton>();
+            RequireForUpdate<PlayerSingleton>();
         }
 
-        void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
+        protected override void OnUpdate()
         {
-            // MonoBehaviour側のプレイヤーを取得
-            var virtualPlayer = SystemAPI.ManagedAPI
-                .GetSingleton<VirtualPlayerManagedComponent>();
+            if (virtualPlayer == null)
+            {
+                // MonoBehaviour側のプレイヤーを取得
+                virtualPlayer = SystemAPI.ManagedAPI
+                    .GetSingleton<VirtualPlayerManagedSingleton>();
+            }
 
             // DOTS側のプレイヤーを取得
             var player = SystemAPI.GetSingletonEntity<PlayerSingleton>();

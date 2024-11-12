@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DOTStoMono
 {
-    public class VirtualPlayerManagedComponent : IComponentData
+    public class VirtualPlayerManagedSingleton : IComponentData
     {
         public Transform VirtualPlayerTransform;
     }
