@@ -2069,7 +2069,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &870273100
 Transform:
   m_ObjectHideFlags: 0
@@ -2761,7 +2761,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 0}
   shotInterval: 3
   gunOffset: {x: 2, y: 1}
-  smooth: 0.325
+  smooth: 1
 --- !u!4 &1041582153
 Transform:
   m_ObjectHideFlags: 0
@@ -2771,7 +2771,7 @@ Transform:
   m_GameObject: {fileID: 1041582151}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

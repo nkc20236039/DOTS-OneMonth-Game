@@ -6,6 +6,7 @@ using Unity.Transforms;
 namespace DOTS
 {
     [BurstCompile]
+    [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
     public partial struct AimingSystem : ISystem
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
@@ -17,28 +18,40 @@ namespace DOTS
         {
             var player = SystemAPI.GetSingletonEntity<PlayerSingleton>();
             var playerTransform = SystemAPI.GetComponent<LocalToWorld>(player);
+            var playerWorld = SystemAPI.GetComponent<LocalToWorld>(player);
 
-            foreach ((var gun, var transform) in SystemAPI.Query<
-                RefRO<GunComponent>,
-                RefRW<LocalTransform>>())
+            state.Dependency = new AimingJob
             {
-                // 銃口をターゲットに向かせる
-                var rotation = quaternion.LookRotationSafe(gun.ValueRO.TargetDirection, math.up());
-                transform.ValueRW.Rotation = rotation;
+                PlayerPosition = playerTransform.Position,
+                PlayerWorld = playerWorld,
+            }.ScheduleParallel(state.Dependency);
 
-                // 銃の回転配置位置を決定
-                var gunOffset
-                    = gun.ValueRO.TargetDirection
-                    * gun.ValueRO.Offset.x;
-                // Y座標オフセットを設定
-                gunOffset.y += gun.ValueRO.Offset.y;
+            state.Dependency.Complete();
+        }
+    }
 
-                var targetPosition = gunOffset + playerTransform.Position;
+    public partial struct AimingJob : IJobEntity
+    {
+        public float3 PlayerPosition;
+        public LocalToWorld PlayerWorld;
+        private void Execute(in GunComponent gun, ref LocalTransform transform)
+        {
+            // 銃口をターゲットに向かせる
+            var rotation = quaternion.LookRotationSafe(gun.TargetDirection, math.up());
+            transform.Rotation = math.mul(math.inverse(PlayerWorld.Rotation), rotation);
 
-                // プレイヤーからの位置を変更する
-                transform.ValueRW.Position = gunOffset;
-                   // = math.lerp(transform.ValueRW.Position, targetPosition, gun.ValueRO.Smooth);
-            }
+            // 銃の回転配置位置を決定
+            var gunOffset
+                = math.forward(transform.Rotation)
+                * gun.Offset.x;
+            // Y座標オフセットを設定
+            gunOffset.y += gun.Offset.y;
+
+            var targetPosition = gunOffset + PlayerPosition;
+
+            // プレイヤーからの位置を変更する
+            transform.Position = targetPosition;
+            // = math.lerp(transform.Position, targetPosition, gun.Smooth);
         }
     }
 }
