@@ -7,6 +7,7 @@ using Unity.Transforms;
 namespace DOTStoMono
 {
     [BurstCompile]
+    [UpdateInGroup(typeof(ActionUpdateGroup))]
     public partial class GunTargetSystem : SystemBase
     {
         private TargetPointManagedSingleton targetPoint;
@@ -33,7 +34,7 @@ namespace DOTStoMono
             foreach (var gun in SystemAPI.Query<RefRW<GunComponent>>())
             {
                 float3 direction = targetPoint.Position - playerTransform.Position;
-
+                
                 // 結果を銃のターゲットに設定
                 gun.ValueRW.TargetDirection = math.normalize(direction);
             }

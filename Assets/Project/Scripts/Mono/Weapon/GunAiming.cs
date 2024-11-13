@@ -32,7 +32,7 @@ namespace Mono
             }
             var ray = viewCamera.ScreenPointToRay(pointer.position.ReadValue());
             RaycastHit hitInfo;
-            var isRaycastHit = Physics.Raycast(ray, out hitInfo, float.MaxValue, groundLayer);
+            bool isRaycastHit = Physics.Raycast(ray, out hitInfo, float.MaxValue, groundLayer);
 
             if (isRaycastHit)
             {

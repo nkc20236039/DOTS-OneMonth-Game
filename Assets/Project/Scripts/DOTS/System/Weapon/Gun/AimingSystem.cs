@@ -2,11 +2,13 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.VisualScripting;
+using UnityEngine.PlayerLoop;
 
 namespace DOTS
 {
     [BurstCompile]
-    [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
+    [UpdateAfter(typeof(ActionUpdateGroup))]
     public partial struct AimingSystem : ISystem
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
@@ -30,10 +32,12 @@ namespace DOTS
         }
     }
 
+    [BurstCompile]
     public partial struct AimingJob : IJobEntity
     {
         public float3 PlayerPosition;
         public LocalToWorld PlayerWorld;
+
         private void Execute(in GunComponent gun, ref LocalTransform transform)
         {
             // 銃口をターゲットに向かせる
@@ -47,11 +51,8 @@ namespace DOTS
             // Y座標オフセットを設定
             gunOffset.y += gun.Offset.y;
 
-            var targetPosition = gunOffset + PlayerPosition;
-
             // プレイヤーからの位置を変更する
-            transform.Position = targetPosition;
-            // = math.lerp(transform.Position, targetPosition, gun.Smooth);
+            transform.Position = gunOffset;
         }
     }
 }
