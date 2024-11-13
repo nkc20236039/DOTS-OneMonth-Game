@@ -15,7 +15,7 @@ namespace DOTStoMono
         protected override void OnCreate()
         {
             RequireForUpdate<TargetPointManagedSingleton>();
-            RequireForUpdate<GunComponent>();
+            RequireForUpdate<WeaponComponent>();
             RequireForUpdate<PlayerSingleton>();
         }
 
@@ -31,7 +31,7 @@ namespace DOTStoMono
             var player = SystemAPI.GetSingletonEntity<PlayerSingleton>();
             var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
 
-            foreach (var gun in SystemAPI.Query<RefRW<GunComponent>>())
+            foreach (var gun in SystemAPI.Query<RefRW<WeaponComponent>>())
             {
                 float3 direction = targetPoint.Position - playerTransform.Position;
                 

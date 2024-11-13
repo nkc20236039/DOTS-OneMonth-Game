@@ -3,13 +3,12 @@ using Unity.Mathematics;
 
 namespace DOTS
 {
-    public struct GunComponent : IComponentData
+    public struct WeaponComponent : IComponentData
     {
-        public float ShotInterval;
-        public Entity Bullet;
         public float2 Offset;
-        public float Smooth;
 
         public float3 TargetDirection;
+        public float3 WorldPosition;
+        public quaternion WorldRotation;
     }
 }

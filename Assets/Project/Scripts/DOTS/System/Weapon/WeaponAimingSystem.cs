@@ -9,15 +9,16 @@ namespace DOTS
 {
     [BurstCompile]
     [UpdateAfter(typeof(ActionUpdateGroup))]
-    public partial struct AimingSystem : ISystem
+    public partial struct WeaponAimingSystem : ISystem
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
-            state.RequireForUpdate<GunComponent>();
+            state.RequireForUpdate<WeaponComponent>();
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
+            // プレイヤーを取得
             var player = SystemAPI.GetSingletonEntity<PlayerSingleton>();
             var playerTransform = SystemAPI.GetComponent<LocalToWorld>(player);
             var playerWorld = SystemAPI.GetComponent<LocalToWorld>(player);
@@ -38,21 +39,29 @@ namespace DOTS
         public float3 PlayerPosition;
         public LocalToWorld PlayerWorld;
 
-        private void Execute(in GunComponent gun, ref LocalTransform transform)
+        private void Execute(ref WeaponComponent weapon, ref LocalTransform transform)
         {
-            // 銃口をターゲットに向かせる
-            var rotation = quaternion.LookRotationSafe(gun.TargetDirection, math.up());
+            // ターゲットの方向を向く
+            var rotation = quaternion.LookRotationSafe(weapon.TargetDirection, math.up());
             transform.Rotation = math.mul(math.inverse(PlayerWorld.Rotation), rotation);
 
-            // 銃の回転配置位置を決定
-            var gunOffset
+            // プレイヤーからのオフセットを作成
+            var offset
                 = math.forward(transform.Rotation)
-                * gun.Offset.x;
+                * weapon.Offset.x;
             // Y座標オフセットを設定
-            gunOffset.y += gun.Offset.y;
+            offset.y += weapon.Offset.y;
+            transform.Position = offset;
 
-            // プレイヤーからの位置を変更する
-            transform.Position = gunOffset;
+            // ワールド座標用のオフセットを作成
+            var worldOffset
+                = math.forward(rotation)
+                * weapon.Offset.x;
+            worldOffset.y += weapon.Offset.y;
+
+            // ワールド情報を保存
+            weapon.WorldPosition = PlayerPosition + worldOffset;
+            weapon.WorldRotation = rotation;
         }
     }
 }

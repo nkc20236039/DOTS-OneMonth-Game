@@ -11,8 +11,8 @@ namespace DOTS
         private float shotInterval;
         [SerializeField]
         private Vector2 gunOffset;
-        [SerializeField, Range(0, 1)]
-        private float smooth;
+        [SerializeField]
+        private Vector2 muzzleOffset;
 
         private class GunBaker : Baker<GunAuthoring>
         {
@@ -20,12 +20,16 @@ namespace DOTS
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 var bullet = GetEntity(authoring.bulletPrefab, TransformUsageFlags.Dynamic);
-                AddComponent(entity, new GunComponent
+
+                AddComponent(entity, new WeaponComponent
+                {
+                    Offset = authoring.gunOffset,
+                });
+                AddComponent(entity, new PistolComponent
                 {
                     Bullet = bullet,
                     ShotInterval = authoring.shotInterval,
-                    Offset = authoring.gunOffset,
-                    Smooth = authoring.smooth
+                    Offset = authoring.muzzleOffset,
                 });
             }
         }
