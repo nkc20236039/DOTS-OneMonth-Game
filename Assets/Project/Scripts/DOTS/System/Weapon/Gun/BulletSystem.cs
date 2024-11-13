@@ -119,6 +119,12 @@ namespace DOTS
                 // A‚ªe’e‚Æ‚í‚©‚é‚½‚ßB‚ğíœ
                 Ecb.DestroyEntity(triggerEvent.EntityB);
             }
+
+            if (isEnemyHit)
+            {
+                Ecb.DestroyEntity(triggerEvent.EntityA);
+                Ecb.DestroyEntity(triggerEvent.EntityB);
+            }
         }
     }
 }
