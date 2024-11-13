@@ -2929,7 +2929,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 5990645879819930574, guid: 1fab642c7389280429afbbd7a0a5b776,
     type: 3}
-  shotInterval: 1
+  shotInterval: 0
   gunOffset: {x: 2, y: 1}
   muzzleOffset: {x: 0.5, y: 0}
 --- !u!4 &1041582153
@@ -4089,7 +4089,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1309196657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4104,7 +4104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnerType: 0
   SpawnRadius: 30
-  SpawnInterval: 1
+  SpawnInterval: 0
   enemyPrefab: {fileID: 3189935247336597887, guid: b268541902f22fa498fbd83007bb47eb,
     type: 3}
 --- !u!4 &1309196658
@@ -5637,7 +5637,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &2012592370
 MeshRenderer:
   m_ObjectHideFlags: 0
