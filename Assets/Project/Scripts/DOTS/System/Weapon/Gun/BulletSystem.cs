@@ -1,3 +1,4 @@
+using System.Globalization;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -18,9 +19,9 @@ namespace DOTS
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
             var simulation = SystemAPI.GetSingleton<SimulationSingleton>();
-
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             state.Dependency = new BulletTriggerJob
             {
                 Ecb = ecb,
@@ -41,10 +42,6 @@ namespace DOTS
 
             state.Dependency.Complete();
             JobHandle.ScheduleBatchedJobs();
-
-            // ecb‚ÌŒãˆ—
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
         }
     }
 
@@ -94,33 +91,32 @@ namespace DOTS
             /*•K—v‚ÈÕ“Ëî•ñ‚Ìbool‚ğİ’è*/
             // ŠÂ‹«‚Æ’e‚ª“–‚½‚Á‚½
             bool isEnvironmentHitAtoB
-                = EnvironmentGroup.EntityExists(triggerEvent.EntityA)
-                && BulletGroup.EntityExists(triggerEvent.EntityB);
+                = EnvironmentGroup.HasComponent(triggerEvent.EntityA)
+                && BulletGroup.HasComponent(triggerEvent.EntityB);
             bool isEnvironmentHitBtoA
-                = BulletGroup.EntityExists(triggerEvent.EntityA)
-                && EnvironmentGroup.EntityExists(triggerEvent.EntityB);
+                = BulletGroup.HasComponent(triggerEvent.EntityA)
+                && EnvironmentGroup.HasComponent(triggerEvent.EntityB);
             // “G‚Æ’e‚ª“–‚½‚Á‚½
-            bool isEnemyHitA
-                = EnemyGroup.EntityExists(triggerEvent.EntityA)
-                || BulletGroup.EntityExists(triggerEvent.EntityA);
-            bool isEnemyHitB
-                = EnemyGroup.EntityExists(triggerEvent.EntityB)
-                || BulletGroup.EntityExists(triggerEvent.EntityB);
-            bool isEnemyHit = isEnemyHitA && isEnemyHitB;
+            bool isEnemyHitAtoB
+                = EnemyGroup.HasComponent(triggerEvent.EntityA)
+                && BulletGroup.HasComponent(triggerEvent.EntityB);
+            bool isEnemyHitBtoA
+                = BulletGroup.HasComponent(triggerEvent.EntityA)
+                && EnemyGroup.HasComponent(triggerEvent.EntityB);
 
             // ŠÂ‹«‚Æ’e‚ª“–‚½‚Á‚½‚ç’e‚ğíœ
             if (isEnvironmentHitAtoB)
             {
-                // B‚ªe’e‚Æ‚í‚©‚é‚½‚ßA‚ğíœ
-                Ecb.DestroyEntity(triggerEvent.EntityA);
+                // B‚ªe’e‚Æ‚í‚©‚é‚½‚ßB‚ğíœ
+                Ecb.DestroyEntity(triggerEvent.EntityB);
             }
             else if (isEnvironmentHitBtoA)
             {
-                // A‚ªe’e‚Æ‚í‚©‚é‚½‚ßB‚ğíœ
-                Ecb.DestroyEntity(triggerEvent.EntityB);
+                // A‚ªe’e‚Æ‚í‚©‚é‚½‚ßA‚ğíœ
+                Ecb.DestroyEntity(triggerEvent.EntityA);
             }
 
-            if (isEnemyHit)
+            if (isEnemyHitAtoB || isEnemyHitBtoA)
             {
                 Ecb.DestroyEntity(triggerEvent.EntityA);
                 Ecb.DestroyEntity(triggerEvent.EntityB);
