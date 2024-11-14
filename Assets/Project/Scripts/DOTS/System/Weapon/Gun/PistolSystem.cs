@@ -18,10 +18,11 @@ namespace DOTS
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
-            foreach ((var pistol, var weapon, var transform) in SystemAPI.Query<
+            foreach ((var pistol, var weapon, var transform, var pistolEntity) in SystemAPI.Query<
                 RefRW<PistolComponent>,
                 RefRO<WeaponComponent>,
-                RefRO<LocalTransform>>())
+                RefRO<LocalTransform>>()
+                .WithEntityAccess())
             {
                 // クールダウンの判定
                 pistol.ValueRW.Cooldown += SystemAPI.Time.DeltaTime;
@@ -37,12 +38,19 @@ namespace DOTS
                 var position = weapon.ValueRO.WorldPosition + offsetDirection;
                 position.y += pistol.ValueRO.Offset.y;
 
+                // 位置を書き換え
                 state.EntityManager.SetComponentData(bullet, new LocalTransform
                 {
                     Position = position,
                     Scale = 1,
                     Rotation = weapon.ValueRO.WorldRotation
                 });
+
+                var bulletComponent = SystemAPI.GetComponent<BulletComponent>(bullet);
+                // 親になっている(プレイヤー想定)エンティティを取得
+                var parent = SystemAPI.GetComponent<Parent>(pistolEntity);
+                // 弾のオーナーを指定
+                bulletComponent.Owner = parent.Value;
 
                 // 時間を初期化
                 pistol.ValueRW.Cooldown = 0;

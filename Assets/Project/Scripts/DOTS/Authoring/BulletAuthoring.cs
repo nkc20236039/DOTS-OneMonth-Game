@@ -9,8 +9,10 @@ namespace DOTS
         private float speed;
         [SerializeField]
         private float lifeTime;
+        [SerializeField]
+        private int attackDamage;
 
-        public class BulletBaker : Baker<BulletAuthoring>
+        private class BulletBaker : Baker<BulletAuthoring>
         {
             public override void Bake(BulletAuthoring authoring)
             {
@@ -18,7 +20,8 @@ namespace DOTS
                 AddComponent(entity, new BulletComponent
                 {
                     Speed = authoring.speed,
-                    Lifetime = authoring.lifeTime
+                    Lifetime = authoring.lifeTime,
+                    AttackDamage = authoring.attackDamage,
                 });
             }
         }
