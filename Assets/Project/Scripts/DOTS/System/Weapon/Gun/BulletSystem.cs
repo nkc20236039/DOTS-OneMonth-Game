@@ -30,7 +30,7 @@ namespace DOTS
             {
                 Ecb = ecb,
                 EnvironmentGroup = SystemAPI.GetComponentLookup<EnvironmentTag>(),
-                HealthGroup = SystemAPI.GetComponentLookup<HealthComponent>(),
+                GameEntityGroup = SystemAPI.GetComponentLookup<HealthComponent>(),
                 BulletGroup = SystemAPI.GetComponentLookup<BulletComponent>(),
             }.Schedule(simulation, state.Dependency);
 
@@ -87,81 +87,56 @@ namespace DOTS
     public partial struct BulletTriggerJob : ITriggerEventsJob
     {
         public EntityCommandBuffer Ecb;
-        [ReadOnly]
-        public ComponentLookup<EnvironmentTag> EnvironmentGroup;
-        public ComponentLookup<HealthComponent> HealthGroup;
-        public ComponentLookup<BulletComponent> BulletGroup;
+        [ReadOnly] public ComponentLookup<EnvironmentTag> EnvironmentGroup;
+        [ReadOnly] public ComponentLookup<HealthComponent> GameEntityGroup;
+        [ReadOnly] public ComponentLookup<BulletComponent> BulletGroup;
 
         public void Execute(TriggerEvent triggerEvent)
         {
-            /*•K—v‚ÈÕ“Ëî•ñ‚Ìbool‚ğİ’è*/
-            // ŠÂ‹«‚Æ’e‚ª“–‚½‚Á‚½
-            bool isEnvironmentHitAtoB
-                = EnvironmentGroup.HasComponent(triggerEvent.EntityA)
-                && BulletGroup.HasComponent(triggerEvent.EntityB);
-            bool isEnvironmentHitBtoA
-                = BulletGroup.HasComponent(triggerEvent.EntityA)
-                && EnvironmentGroup.HasComponent(triggerEvent.EntityB);
-            // “G‚Æ’e‚ª“–‚½‚Á‚½
-            bool isHealthHitAtoB
-                = HealthGroup.HasComponent(triggerEvent.EntityA)
-                && BulletGroup.HasComponent(triggerEvent.EntityB);
-            bool isHealthHitBtoA
-                = BulletGroup.HasComponent(triggerEvent.EntityA)
-                && HealthGroup.HasComponent(triggerEvent.EntityB);
+            // ŠÂ‹«‚Æ’e
+            var environmentInfo = TriggerEventExplicit(triggerEvent, EnvironmentGroup, BulletGroup);
+            // ƒQ[ƒ€ƒGƒ“ƒeƒBƒeƒB‚Æ’e
+            var gameEntityInfo = TriggerEventExplicit(triggerEvent, GameEntityGroup, BulletGroup);
 
-            // ŠÂ‹«‚Æ’e‚ª“–‚½‚Á‚½‚ç’e‚ğíœ
-            if (isEnvironmentHitAtoB)
+            if (environmentInfo.IsHit)
             {
+                // ŠÂ‹«‚Æ’e‚ª“–‚½‚Á‚½ê‡
                 // B‚ªe’e‚Æ‚í‚©‚é‚½‚ßB‚ğíœ
-                Ecb.DestroyEntity(triggerEvent.EntityB);
-            }
-            else if (isEnvironmentHitBtoA)
-            {
-                // A‚ªe’e‚Æ‚í‚©‚é‚½‚ßA‚ğíœ
-                Ecb.DestroyEntity(triggerEvent.EntityA);
+                Ecb.DestroyEntity(environmentInfo.EntityB);
             }
 
-            if (isHealthHitAtoB)
-            {
-                // •K—v‚ÈƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾
-                HealthComponent _health;
-                BulletComponent _bullet;
-                if (HealthGroup.TryGetComponent(triggerEvent.EntityA, out _health) == false) { return; }
-                if (BulletGroup.TryGetComponent(triggerEvent.EntityB, out _bullet) == false) { return; }
-
-
-                // “–‚½‚Á‚½‚ç‘Šè‚Ì‘Ì—Í‚ğŒ¸‚ç‚·
-                _health = Attack(triggerEvent.EntityB, _health, _bullet.AttackDamage);
-                Ecb.SetComponent(triggerEvent.EntityA, _health);
-            }
-            else if (isHealthHitBtoA)
+            if (gameEntityInfo.IsHit)
             {
                 // •K—v‚ÈƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾
                 HealthComponent health;
                 BulletComponent bullet;
-                if (BulletGroup.TryGetComponent(triggerEvent.EntityA, out bullet) == false) { return; }
-                if (HealthGroup.TryGetComponent(triggerEvent.EntityB, out health) == false) { return; }
+                if (GameEntityGroup.TryGetComponent(gameEntityInfo.EntityA, out health) == false) { return; }
+                if (BulletGroup.TryGetComponent(gameEntityInfo.EntityB, out bullet) == false) { return; }
 
                 // “–‚½‚Á‚½‚ç‘Šè‚Ì‘Ì—Í‚ğŒ¸‚ç‚·
-                health = Attack(triggerEvent.EntityA, health, bullet.AttackDamage);
-                Ecb.SetComponent(triggerEvent.EntityB, health);
+                // TODO: ˆø”‚Æ–ß‚è’l‚ÌŠÖŒW«‚ª•ª‚©‚è‚É‚­‚¢‚Ì‚ÅC³‚·‚é
+                health = Attack(gameEntityInfo.EntityB, health, bullet.AttackDamage);
+                Ecb.SetComponent(gameEntityInfo.EntityA, health);
             }
         }
 
-        private (bool isHit, Entity entityA, Entity entityB) TriggerEventExplicit<EntityA, EntityB>(
+        private (bool IsHit, Entity EntityA, Entity EntityB) TriggerEventExplicit<EntityA, EntityB>(
             TriggerEvent triggerEvent,
             ComponentLookup<EntityA> entityA,
             ComponentLookup<EntityB> entityB)
             where EntityA : unmanaged, IComponentData
             where EntityB : unmanaged, IComponentData
         {
-            if (EnvironmentGroup.HasComponent(triggerEvent.EntityA) && BulletGroup.HasComponent(triggerEvent.EntityB))
+            if (entityA.HasComponent(triggerEvent.EntityA) && entityB.HasComponent(triggerEvent.EntityB))
             {
-
+                return (true, triggerEvent.EntityA, triggerEvent.EntityB);
+            }
+            if (entityA.HasComponent(triggerEvent.EntityB) && entityB.HasComponent(triggerEvent.EntityA))
+            {
+                return (true, triggerEvent.EntityB, triggerEvent.EntityA);
             }
 
-            return default;
+            return (false, Entity.Null, Entity.Null);
         }
 
         private HealthComponent Attack(Entity bullet, HealthComponent health, int damage)
