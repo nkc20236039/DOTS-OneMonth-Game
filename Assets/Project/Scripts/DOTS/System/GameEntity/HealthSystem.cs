@@ -16,7 +16,10 @@ namespace DOTS
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach ((var health, var entity) in SystemAPI.Query<RefRO<HealthComponent>>().WithEntityAccess())
+            foreach ((var health, var entity) in SystemAPI
+                .Query<RefRO<HealthComponent>>()
+                .WithNone<PlayerSingleton>()    // プレイヤーは別の処理をするためこのSystemで処理をしない
+                .WithEntityAccess())
             {
                 // 体力が0ではなかったらこのEntityはスキップ
                 if (0 < health.ValueRO.Health) { continue; }

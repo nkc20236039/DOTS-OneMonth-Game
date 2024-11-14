@@ -5,7 +5,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
-using UnityEngine;
 
 namespace DOTS
 {
@@ -29,9 +28,9 @@ namespace DOTS
             state.Dependency = new BulletTriggerJob
             {
                 Ecb = ecb,
-                EnvironmentGroup = SystemAPI.GetComponentLookup<EnvironmentTag>(),
-                GameEntityGroup = SystemAPI.GetComponentLookup<HealthComponent>(),
-                BulletGroup = SystemAPI.GetComponentLookup<BulletComponent>(),
+                EnvironmentGroup = SystemAPI.GetComponentLookup<EnvironmentTag>(true),
+                GameEntityGroup = SystemAPI.GetComponentLookup<HealthComponent>(true),
+                BulletGroup = SystemAPI.GetComponentLookup<BulletComponent>(true),
             }.Schedule(simulation, state.Dependency);
 
             // 衝突判定Jobが終了することを待機
@@ -112,6 +111,10 @@ namespace DOTS
                 BulletComponent bullet;
                 if (GameEntityGroup.TryGetComponent(gameEntityInfo.EntityA, out health) == false) { return; }
                 if (BulletGroup.TryGetComponent(gameEntityInfo.EntityB, out bullet) == false) { return; }
+
+                // HealthComponentを所持しているエンティティがBulletの発射主だったらダメージ処理をしない
+                if (gameEntityInfo.EntityA == bullet.Owner) { return; }
+                // 発射主がチームのコンポーネントを所持していたらそのチームとの衝突判定も無視する
 
                 // 当たったら相手の体力を減らす
                 // TODO: 引数と戻り値の関係性が分かりにくいので修正する

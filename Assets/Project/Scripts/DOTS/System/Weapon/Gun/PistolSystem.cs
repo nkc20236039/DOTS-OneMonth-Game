@@ -46,11 +46,11 @@ namespace DOTS
                     Rotation = weapon.ValueRO.WorldRotation
                 });
 
-                var bulletComponent = SystemAPI.GetComponent<BulletComponent>(bullet);
+                var bulletComponent = SystemAPI.GetComponentRW<BulletComponent>(bullet);
                 // 親になっている(プレイヤー想定)エンティティを取得
                 var parent = SystemAPI.GetComponent<Parent>(pistolEntity);
                 // 弾のオーナーを指定
-                bulletComponent.Owner = parent.Value;
+                bulletComponent.ValueRW.Owner = parent.Value;
 
                 // 時間を初期化
                 pistol.ValueRW.Cooldown = 0;
