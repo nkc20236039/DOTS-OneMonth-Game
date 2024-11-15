@@ -4,11 +4,12 @@ using Unity.Entities;
 namespace DOTS
 {
     [BurstCompile]
-    public partial struct HealthSystem : ISystem
+    public partial struct EnemyHealthSystem : ISystem
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
             state.RequireForUpdate<HealthComponent>();
+            state.RequireForUpdate<EnemyTag>();
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
@@ -18,7 +19,7 @@ namespace DOTS
 
             foreach ((var health, var entity) in SystemAPI
                 .Query<RefRO<HealthComponent>>()
-                .WithNone<PlayerSingleton>()    // プレイヤーは別の処理をするためこのSystemで処理をしない
+                .WithAll<EnemyTag>()
                 .WithEntityAccess())
             {
                 // 体力が0ではなかったらこのEntityはスキップ

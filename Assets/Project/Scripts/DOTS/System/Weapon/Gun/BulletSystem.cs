@@ -5,6 +5,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
+using UnityPhysicsExpansion;
 
 namespace DOTS
 {
@@ -93,15 +94,17 @@ namespace DOTS
         public void Execute(TriggerEvent triggerEvent)
         {
             // 環境と弾
-            var environmentInfo = TriggerEventExplicit(triggerEvent, EnvironmentGroup, BulletGroup);
+            (bool IsHit, Entity bullet, Entity environment) environmentInfo
+                = PhysicsTriggerEvent.TriggerEventExplicit(triggerEvent, BulletGroup, EnvironmentGroup);
             // ゲームエンティティと弾
-            var gameEntityInfo = TriggerEventExplicit(triggerEvent, GameEntityGroup, BulletGroup);
+            (bool IsHit, Entity bullet, Entity gameEntity) gameEntityInfo
+                = PhysicsTriggerEvent.TriggerEventExplicit(triggerEvent, BulletGroup, EnvironmentGroup);
 
             if (environmentInfo.IsHit)
             {
                 // 環境と弾が当たった場合
                 // Bが銃弾とわかるためBを削除
-                Ecb.DestroyEntity(environmentInfo.EntityB);
+                Ecb.DestroyEntity(environmentInfo.bullet);
             }
 
             if (gameEntityInfo.IsHit)
@@ -109,45 +112,19 @@ namespace DOTS
                 // 必要なコンポーネントを取得
                 HealthComponent health;
                 BulletComponent bullet;
-                if (GameEntityGroup.TryGetComponent(gameEntityInfo.EntityA, out health) == false) { return; }
-                if (BulletGroup.TryGetComponent(gameEntityInfo.EntityB, out bullet) == false) { return; }
+                if (GameEntityGroup.TryGetComponent(gameEntityInfo.gameEntity, out health) == false) { return; }
+                if (BulletGroup.TryGetComponent(gameEntityInfo.bullet, out bullet) == false) { return; }
 
                 // HealthComponentを所持しているエンティティがBulletの発射主だったらダメージ処理をしない
-                if (gameEntityInfo.EntityA == bullet.Owner) { return; }
+                if (gameEntityInfo.gameEntity == bullet.Owner) { return; }
                 // 発射主がチームのコンポーネントを所持していたらそのチームとの衝突判定も無視する
 
-                // 当たったら相手の体力を減らす
-                // TODO: 引数と戻り値の関係性が分かりにくいので修正する
-                health = Attack(gameEntityInfo.EntityB, health, bullet.AttackDamage);
-                Ecb.SetComponent(gameEntityInfo.EntityA, health);
+                // 当たった相手の体力を減少させる
+                health.Health -= bullet.AttackDamage;
+                Ecb.SetComponent(gameEntityInfo.gameEntity, health);
+                // 弾を削除する
+                Ecb.DestroyEntity(gameEntityInfo.bullet);
             }
-        }
-
-        private (bool IsHit, Entity EntityA, Entity EntityB) TriggerEventExplicit<EntityA, EntityB>(
-            TriggerEvent triggerEvent,
-            ComponentLookup<EntityA> entityA,
-            ComponentLookup<EntityB> entityB)
-            where EntityA : unmanaged, IComponentData
-            where EntityB : unmanaged, IComponentData
-        {
-            if (entityA.HasComponent(triggerEvent.EntityA) && entityB.HasComponent(triggerEvent.EntityB))
-            {
-                return (true, triggerEvent.EntityA, triggerEvent.EntityB);
-            }
-            if (entityA.HasComponent(triggerEvent.EntityB) && entityB.HasComponent(triggerEvent.EntityA))
-            {
-                return (true, triggerEvent.EntityB, triggerEvent.EntityA);
-            }
-
-            return (false, Entity.Null, Entity.Null);
-        }
-
-        private HealthComponent Attack(Entity bullet, HealthComponent health, int damage)
-        {
-            Ecb.DestroyEntity(bullet);
-            health.Health -= damage;
-
-            return health;
         }
     }
 }

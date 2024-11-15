@@ -20,6 +20,7 @@ namespace DOTS
                     Speed = authoring.speed,
                     HomingAccuracy = authoring.HomingAccuracy
                 });
+                AddComponent(enemy, typeof(EnemyTag));
             }
         }
     }

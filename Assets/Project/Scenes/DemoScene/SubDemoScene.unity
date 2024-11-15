@@ -4103,7 +4103,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1309196657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4118,7 +4118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnerType: 0
   SpawnRadius: 30
-  SpawnInterval: 2
+  SpawnInterval: 3
   enemyPrefab: {fileID: 3189935247336597887, guid: b268541902f22fa498fbd83007bb47eb,
     type: 3}
 --- !u!4 &1309196658
@@ -5372,6 +5372,7 @@ GameObject:
   - component: {fileID: 1822973599}
   - component: {fileID: 1822973601}
   - component: {fileID: 1822973600}
+  - component: {fileID: 1822973602}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -5445,6 +5446,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1822973598}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!95 &1822973602
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822973598}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1886040564
 GameObject:
   m_ObjectHideFlags: 0
