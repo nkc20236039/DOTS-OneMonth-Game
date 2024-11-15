@@ -22,7 +22,7 @@ namespace DOTS
         {
             // Jobに渡すものの準備
             var simulation = SystemAPI.GetSingleton<SimulationSingleton>();
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
             // 衝突判定のJobを作成
@@ -98,7 +98,7 @@ namespace DOTS
                 = PhysicsTriggerEvent.TriggerEventExplicit(triggerEvent, BulletGroup, EnvironmentGroup);
             // ゲームエンティティと弾
             (bool IsHit, Entity bullet, Entity gameEntity) gameEntityInfo
-                = PhysicsTriggerEvent.TriggerEventExplicit(triggerEvent, BulletGroup, EnvironmentGroup);
+                = PhysicsTriggerEvent.TriggerEventExplicit(triggerEvent, BulletGroup, GameEntityGroup);
 
             if (environmentInfo.IsHit)
             {
