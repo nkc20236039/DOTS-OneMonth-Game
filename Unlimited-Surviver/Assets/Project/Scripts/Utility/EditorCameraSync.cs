@@ -20,7 +20,7 @@ public class EditorCameraSync : MonoBehaviour
     {
         // シーンビューが無ければ実行しない
         if(SceneView.lastActiveSceneView == null) { return; }
-
+/*
         if (SceneView.lastActiveSceneView.hasFocus)
         {
             // シーンビューにフォーカスされていればゲームビューのDisplayをカメラのDiplayに変える
@@ -32,7 +32,7 @@ public class EditorCameraSync : MonoBehaviour
                 gameView.Repaint();  // Display変更後にビューを更新
             }
         }
-
+*/
         gameCamera.transform.position = sceneCamera.transform.position;
         gameCamera.transform.rotation = sceneCamera.transform.rotation;
         gameCamera.fieldOfView = sceneCamera.fieldOfView;

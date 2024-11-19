@@ -7,17 +7,36 @@ using UnityEngine;
 public class HitDamagePresenter : MonoBehaviour
 {
     [SerializeField]
-    private IObjectPool<HitDamageView> hitDamagePool;
+    private GameObject hitDamagePoolObject;
     [SerializeField]
     private Camera viewCamera;
     [SerializeField]
     private RectTransform canvasTransform;
 
+    private IObjectPool<HitDamageView> hitDamagePool;
+    private RectTransform rootCanvasTransform;
     private EntityQuery query;
     private bool isInitalized;
 
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (hitDamagePoolObject != null && !hitDamagePoolObject.TryGetComponent<IObjectPool<HitDamageView>>(out _))
+        {
+            // IObjectPoolが付いていなければ警告
+            Debug.LogError($"Hit Damage Pool Objectに無効な値がセットされています\n{hitDamagePoolObject}にIObjectPool<HitDamageView>がアタッチされていません");
+            hitDamagePoolObject = null;
+        }
+    }
+#endif
+
     private void Start()
     {
+        // オブジェクトプールを取得
+        hitDamagePool = hitDamagePoolObject.GetComponent<IObjectPool<HitDamageView>>();
+        // 元のキャンバス取得
+        rootCanvasTransform = canvasTransform.root.GetComponent<RectTransform>();
+
         StartCoroutine(StartProcess());
     }
 
@@ -68,14 +87,17 @@ public class HitDamagePresenter : MonoBehaviour
 
         // ワールド座標をUIの座標に変換する
         var screenPosition = viewCamera.WorldToScreenPoint(hitDamage.Position);
+
+        screenPosition.y += 125;
+
         RectTransformUtility.ScreenPointToLocalPointInRectangle
         (
-            canvasTransform,
+            rootCanvasTransform,
             screenPosition,
             null,
             out Vector2 uiLocalPosition
         );
 
-        ui.Show(hitDamage.DamageValue, uiLocalPosition);
+        ui.Show(hitDamage.DamageValue, screenPosition, hitDamagePool);
     }
 }
