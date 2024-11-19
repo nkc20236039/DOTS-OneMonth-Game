@@ -30,8 +30,9 @@ namespace DOTS
             {
                 Ecb = ecb,
                 EnvironmentGroup = SystemAPI.GetComponentLookup<EnvironmentTag>(true),
-                GameEntityGroup = SystemAPI.GetComponentLookup<HealthComponent>(true),
+                GameEntityGroup = SystemAPI.GetComponentLookup<HitDamageComponent>(true),
                 BulletGroup = SystemAPI.GetComponentLookup<BulletComponent>(true),
+                Transform = SystemAPI.GetComponentLookup<LocalTransform>(true),
             }.Schedule(simulation, state.Dependency);
 
             // 衝突判定Jobが終了することを待機
@@ -88,8 +89,9 @@ namespace DOTS
     {
         public EntityCommandBuffer Ecb;
         [ReadOnly] public ComponentLookup<EnvironmentTag> EnvironmentGroup;
-        [ReadOnly] public ComponentLookup<HealthComponent> GameEntityGroup;
+        [ReadOnly] public ComponentLookup<HitDamageComponent> GameEntityGroup;
         [ReadOnly] public ComponentLookup<BulletComponent> BulletGroup;
+        [ReadOnly] public ComponentLookup<LocalTransform> Transform;
 
         public void Execute(TriggerEvent triggerEvent)
         {
@@ -110,20 +112,26 @@ namespace DOTS
             if (gameEntityInfo.IsHit)
             {
                 // 必要なコンポーネントを取得
-                HealthComponent health;
+                HitDamageComponent hitDamage;
                 BulletComponent bullet;
-                if (GameEntityGroup.TryGetComponent(gameEntityInfo.gameEntity, out health) == false) { return; }
+                if (GameEntityGroup.TryGetComponent(gameEntityInfo.gameEntity, out hitDamage) == false) { return; }
                 if (BulletGroup.TryGetComponent(gameEntityInfo.bullet, out bullet) == false) { return; }
 
-                // HealthComponentを所持しているエンティティがBulletの発射主だったらダメージ処理をしない
+                // DamageComponentを所持しているエンティティがBulletの発射主だったらダメージ処理をしない
                 if (gameEntityInfo.gameEntity == bullet.Owner) { return; }
                 // 発射主がチームのコンポーネントを所持していたらそのチームとの衝突判定も無視する
 
-                // 当たった相手の体力を減少させる
-                health.Health -= bullet.AttackDamage;
-                Ecb.SetComponent(gameEntityInfo.gameEntity, health);
-
-                // 相手にダメージタグを
+                // 当たった相手にダメージの情報を与える
+                LocalTransform transform;
+                if (Transform.TryGetComponent(gameEntityInfo.gameEntity, out transform) == false) { return; }
+                Ecb.SetComponentEnabled<HitDamageComponent>(gameEntityInfo.gameEntity, true);
+                Ecb.SetComponent(gameEntityInfo.gameEntity, new HitDamageComponent
+                {
+                    IsUIShowing = false,
+                    IsDistributed = false,
+                    DamageValue = bullet.AttackDamage,
+                    Position = transform.Position,
+                });
 
                 // 弾を削除する
                 Ecb.DestroyEntity(gameEntityInfo.bullet);

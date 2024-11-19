@@ -8,6 +8,6 @@ namespace DOTS
         public float Speed;             // 速度
         public float HomingAccuracy;    // ホーミング精度
 
-        public quaternion targetRotation;
+        public quaternion TargetRotation;
     }
 }

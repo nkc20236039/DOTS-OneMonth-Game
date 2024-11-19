@@ -17,11 +17,19 @@ namespace DOTS
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach ((var health, var entity) in SystemAPI
-                .Query<RefRO<HealthComponent>>()
+            foreach ((var health, var damage, var entity) in SystemAPI
+                .Query<RefRW<HealthComponent>, RefRW<HitDamageComponent>>()
                 .WithAll<EnemyTag>()
                 .WithEntityAccess())
             {
+                // ダメージを受けていれば体力を減少させる
+                bool isDamageEnable = state.EntityManager.IsComponentEnabled<HitDamageComponent>(entity);
+                if (isDamageEnable && !damage.ValueRO.IsDistributed)
+                {
+                    health.ValueRW.Health -= damage.ValueRO.DamageValue;
+                    damage.ValueRW.IsDistributed = true;
+                }
+
                 // 体力が0ではなかったらこのEntityはスキップ
                 if (0 < health.ValueRO.Health) { continue; }
 

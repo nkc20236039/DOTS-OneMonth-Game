@@ -15,11 +15,13 @@ namespace DOTS
             public override void Bake(EnemyHomingAuthoring authoring)
             {
                 var enemy = GetEntity(TransformUsageFlags.None);
+                // 追従エネミーコンポーネント追加
                 AddComponent(enemy, new EnemyHomingComponent
                 {
                     Speed = authoring.speed,
                     HomingAccuracy = authoring.HomingAccuracy
                 });
+                // 敵フラグ追加
                 AddComponent(enemy, typeof(EnemyTag));
             }
         }

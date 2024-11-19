@@ -4,8 +4,8 @@ namespace DOTS
 {
     public struct HealthComponent : IComponentData
     {
-        public uint MaxHealth;
+        public float MaxHealth;
 
-        public int Health;
+        public float Health;
     }
 }
