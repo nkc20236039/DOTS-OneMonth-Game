@@ -16,7 +16,6 @@ public class HitDamagePresenter : MonoBehaviour
     private IObjectPool<HitDamageView> hitDamagePool;
     private RectTransform rootCanvasTransform;
     private EntityQuery query;
-    private bool isInitalized;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -45,7 +44,6 @@ public class HitDamagePresenter : MonoBehaviour
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         // EntityManager‚Ì€”õ‚ªŠ®—¹‚·‚é‚Ì‚ğ‘Ò‚Â
         yield return null;
-        isInitalized = true;
 
         // EntityQuery‚ğì¬‚·‚é
         var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
