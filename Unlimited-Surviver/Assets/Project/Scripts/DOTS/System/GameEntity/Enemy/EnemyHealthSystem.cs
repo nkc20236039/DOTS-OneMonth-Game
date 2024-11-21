@@ -74,10 +74,11 @@ namespace DOTS
             for (int i = 0; i < expOrbDrop.SpawnAmount; i++)
             {
                 var orb = ParallelEcb.Instantiate(index, expOrbDrop.ExperienceOrb);
-
+                var dropPosition = transform.Position;
+                dropPosition.y += 1f;
                 ParallelEcb.SetComponent(index, orb, new LocalTransform
                 {
-                    Position = transform.Position,
+                    Position = dropPosition,
                     Scale = TransformGroup[expOrbDrop.ExperienceOrb].Scale,
                     Rotation = TransformGroup[expOrbDrop.ExperienceOrb].Rotation,
                 });

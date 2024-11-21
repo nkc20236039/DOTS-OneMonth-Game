@@ -1,14 +1,15 @@
-using Unity.Burst;
+ï»¿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
+using UnityPhysicsExpansion;
 
 namespace DOTS
 {
     /// <summary>
-    /// ƒvƒŒƒCƒ„[‚ÌˆÚ“®ƒRƒ“ƒgƒ[ƒ‹
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«
     /// </summary>
     [UpdateInGroup(typeof(InputUpdateGroup))]
     [BurstCompile]
@@ -29,11 +30,24 @@ namespace DOTS
             }.ScheduleParallel(state.Dependency);
 
             state.Dependency.Complete();
+
+            var simulation = SystemAPI.GetSingleton<SimulationSingleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
+            state.Dependency = new PlayerExpGetJob
+            {
+                Ecb = ecb,
+                ExpGroup = SystemAPI.GetComponentLookup<ExperienceOrbComponent>(true),
+                Player = SystemAPI.GetSingletonEntity<PlayerSingleton>(),
+            }.Schedule(simulation, state.Dependency);
+
+            state.Dependency.Complete();
         }
     }
 
     /// <summary>
-    /// ƒvƒŒƒCƒ„[ˆÚ“®Job
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç§»å‹•Job
     /// </summary>
     [BurstCompile]
     public partial struct PlayerMovementJob : IJobEntity
@@ -46,7 +60,7 @@ namespace DOTS
             ref PhysicsMass mass,
             in PlayerInputComponent playerInput)
         {
-            // ó‚¯æ‚Á‚½“ü—Í‚ğ•½–Ê‚Ö•ÏŠ·
+            // å—ã‘å–ã£ãŸå…¥åŠ›ã‚’å¹³é¢ã¸å¤‰æ›
             float3 moveDirection = new
             (
                 playerInput.MoveDirection.x,
@@ -55,23 +69,23 @@ namespace DOTS
             );
             moveDirection = math.normalizesafe(moveDirection);
 
-            // ‘¬“x‚ğ“K—p
+            // é€Ÿåº¦ã‚’é©ç”¨
             velocity.Linear
                 = moveDirection
                 * Player.Speed;
 
-            // YÀ•W‚ğ0‚ÉŒÅ’è
+            // Yåº§æ¨™ã‚’0ã«å›ºå®š
             transform.Position.y = 0;
 
-            // ˆÚ“®‚ğ‚µ‚Ä‚¢‚È‚¯‚ê‚Î‚±‚êˆÈ~‚Ìˆ—‚ğÀs‚µ‚È‚¢
-            // (“ü—Í‚ğŠÄ‹‚µ‚Ä‚¢‚ÄƒGƒ“ƒeƒBƒeƒB‘S‚Äˆ—‚ªs‚í‚ê‚È‚¢‚±‚Æ‚ªŠm’è‚µ‚Ä‚¢‚é‚½‚ßƒ‹[ƒv‚ğ”²‚¯‚Ä‚æ‚¢)
+            // ç§»å‹•ã‚’ã—ã¦ã„ãªã‘ã‚Œã°ã“ã‚Œä»¥é™ã®å‡¦ç†ã‚’å®Ÿè¡Œã—ãªã„
+            // (å…¥åŠ›ã‚’ç›£è¦–ã—ã¦ã„ã¦ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£å…¨ã¦å‡¦ç†ãŒè¡Œã‚ã‚Œãªã„ã“ã¨ãŒç¢ºå®šã—ã¦ã„ã‚‹ãŸã‚ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã¦ã‚ˆã„)
             if (math.distancesq(float3.zero, moveDirection) == 0) { return; }
 
-            /*‰ñ“]‚ÌŒvZ*/
+            /*å›è»¢ã®è¨ˆç®—*/
             quaternion currentRotation = transform.Rotation;
             quaternion lookRotation = quaternion.LookRotationSafe(moveDirection, math.up());
 
-            // ƒXƒ€[ƒY‚É‰ñ“]‚³‚¹‚é
+            // ã‚¹ãƒ ãƒ¼ã‚ºã«å›è»¢ã•ã›ã‚‹
             transform.Rotation
                 = math.slerp
                 (
@@ -80,8 +94,33 @@ namespace DOTS
                     Player.RotationSpeed
                 );
 
-            // •¨—‚Ì‰ñ“]‚ğŒÅ’è
+            // ç‰©ç†ã®å›è»¢ã‚’å›ºå®š
             mass.InverseInertia = float3.zero;
+        }
+    }
+
+    [BurstCompile]
+    public partial struct PlayerExpGetJob : ICollisionEventsJob
+    {
+        [ReadOnly]
+        public ComponentLookup<ExperienceOrbComponent> ExpGroup;
+        [ReadOnly]
+        public Entity Player;
+        public EntityCommandBuffer Ecb;
+
+        public void Execute(CollisionEvent collisionEvent)
+        {
+            if ((collisionEvent.EntityA == Player || collisionEvent.EntityB == Player) && (ExpGroup.HasComponent(collisionEvent.EntityA) || ExpGroup.HasComponent(collisionEvent.EntityB)))
+            {
+                if (ExpGroup.HasComponent(collisionEvent.EntityA))
+                {
+                    Ecb.DestroyEntity(collisionEvent.EntityA);
+                }
+                if (ExpGroup.HasComponent(collisionEvent.EntityB))
+                {
+                    Ecb.DestroyEntity(collisionEvent.EntityB);
+                }
+            }
         }
     }
 }

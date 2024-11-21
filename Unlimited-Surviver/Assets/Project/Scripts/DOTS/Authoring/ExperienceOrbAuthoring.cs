@@ -8,6 +8,10 @@ namespace DOTS
         [SerializeField]
         private float point;
         [SerializeField]
+        private float attractedSpeed;
+        [SerializeField]
+        private float attractedRange;
+        [SerializeField]
         private float dropAngleRange;
         [SerializeField]
         private float dropForce;
@@ -20,6 +24,8 @@ namespace DOTS
                 AddComponent(entity, new ExperienceOrbComponent
                 {
                     Point = authoring.point,
+                    AttractedSpeed = authoring.attractedSpeed,
+                    AttractedRange = authoring.attractedRange,
                     DropAngleRange = authoring.dropAngleRange,
                     DropForce = authoring.dropForce,
                 });

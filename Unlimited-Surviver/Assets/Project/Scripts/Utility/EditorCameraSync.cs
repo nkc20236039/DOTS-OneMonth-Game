@@ -19,20 +19,7 @@ public class EditorCameraSync : MonoBehaviour
     void Update()
     {
         // シーンビューが無ければ実行しない
-        if(SceneView.lastActiveSceneView == null) { return; }
-/*
-        if (SceneView.lastActiveSceneView.hasFocus)
-        {
-            // シーンビューにフォーカスされていればゲームビューのDisplayをカメラのDiplayに変える
-            EditorWindow gameView = EditorWindow.GetWindow(GetTypeFromName("UnityEditor.GameView"));
-            var displayField = gameView.GetType().GetField("m_TargetDisplay", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (displayField != null)
-            {
-                displayField.SetValue(gameView, gameCamera.targetDisplay);
-                gameView.Repaint();  // Display変更後にビューを更新
-            }
-        }
-*/
+        if (sceneCamera == null) { return; }
         gameCamera.transform.position = sceneCamera.transform.position;
         gameCamera.transform.rotation = sceneCamera.transform.rotation;
         gameCamera.fieldOfView = sceneCamera.fieldOfView;
