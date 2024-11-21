@@ -1,6 +1,7 @@
 ﻿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 
@@ -37,6 +38,8 @@ namespace DOTS
                 }
             }
 
+            // 死亡処理
+            // JobのQuery作成
             var entityQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<EnemyTag, LocalTransform, HealthComponent, ExperienceOrbDropComponent>()
                 .Build(state.EntityManager);
@@ -44,6 +47,7 @@ namespace DOTS
             state.Dependency = new EnemyDieJob
             {
                 ParallelEcb = ecb.AsParallelWriter(),
+                TransformGroup = SystemAPI.GetComponentLookup<LocalTransform>(),
             }.ScheduleParallel(entityQuery, state.Dependency);
 
             state.Dependency.Complete();
@@ -53,25 +57,29 @@ namespace DOTS
     public partial struct EnemyDieJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ParallelEcb;
+        [ReadOnly]
+        public ComponentLookup<LocalTransform> TransformGroup;
 
         private void Execute(
             [ChunkIndexInQuery] int index,
             Entity entity,
             in LocalTransform transform,
             in HealthComponent health,
-            in ExperienceOrbDropComponent exOrbDrop)
+            in ExperienceOrbDropComponent expOrbDrop)
         {
             if (0 < health.Health) { return; }
+            if (TransformGroup.HasComponent(expOrbDrop.ExperienceOrb) == false) { return; }
 
             // 経験値をドロップする
-            for (int i = 0; i < exOrbDrop.SpawnAmount; i++)
+            for (int i = 0; i < expOrbDrop.SpawnAmount; i++)
             {
-                var orb = ParallelEcb.Instantiate(index, exOrbDrop.ExperienceOrb);
+                var orb = ParallelEcb.Instantiate(index, expOrbDrop.ExperienceOrb);
 
                 ParallelEcb.SetComponent(index, orb, new LocalTransform
                 {
                     Position = transform.Position,
-                    Scale = 1,
+                    Scale = TransformGroup[expOrbDrop.ExperienceOrb].Scale,
+                    Rotation = TransformGroup[expOrbDrop.ExperienceOrb].Rotation,
                 });
             }
 

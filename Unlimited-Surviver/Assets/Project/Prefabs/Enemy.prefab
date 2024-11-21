@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80ddc250fa3ff3b4c806005128d14df6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 1
 --- !u!114 &1382614415769856003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -160,7 +160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e8455e6c41960c4ea5c569164d47964, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnAmount: 3
+  spawnAmount: 10
   experienceOrbPrefab: {fileID: 7764912716517723568, guid: f3a434e0a5a44c445a2da49df503b695,
     type: 3}
 --- !u!114 &8089128465830633492
