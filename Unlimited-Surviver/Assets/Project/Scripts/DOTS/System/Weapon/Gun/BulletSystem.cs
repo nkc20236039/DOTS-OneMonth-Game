@@ -97,10 +97,10 @@ namespace DOTS
         {
             // 環境と弾
             (bool IsHit, Entity bullet, Entity environment) environmentInfo
-                = PhysicsTriggerEvent.TriggerEventExplicit(triggerEvent, BulletGroup, EnvironmentGroup);
+                = CollisionResponseExplicit.TriggerEvent(triggerEvent, BulletGroup, EnvironmentGroup);
             // ゲームエンティティと弾
             (bool IsHit, Entity bullet, Entity gameEntity) gameEntityInfo
-                = PhysicsTriggerEvent.TriggerEventExplicit(triggerEvent, BulletGroup, GameEntityGroup);
+                = CollisionResponseExplicit.TriggerEvent(triggerEvent, BulletGroup, GameEntityGroup);
 
             if (environmentInfo.IsHit)
             {
