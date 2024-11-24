@@ -1,4 +1,4 @@
-using DOTS;
+ï»¿using DOTS;
 using System.Collections;
 using Unity.Collections;
 using Unity.Entities;
@@ -22,8 +22,8 @@ public class HitDamagePresenter : MonoBehaviour
     {
         if (hitDamagePoolObject != null && !hitDamagePoolObject.TryGetComponent<IObjectPool<HitDamageView>>(out _))
         {
-            // IObjectPool‚ª•t‚¢‚Ä‚¢‚È‚¯‚ê‚ÎŒx
-            Debug.LogError($"Hit Damage Pool Object‚É–³Œø‚È’l‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚Ü‚·\n{hitDamagePoolObject}‚ÉIObjectPool<HitDamageView>‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");
+            // IObjectPoolãŒä»˜ã„ã¦ã„ãªã‘ã‚Œã°è­¦å‘Š
+            Debug.LogError($"Hit Damage Pool Objectã«ç„¡åŠ¹ãªå€¤ãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ã¾ã™\n{hitDamagePoolObject}ã«IObjectPool<HitDamageView>ãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã¾ã›ã‚“");
             hitDamagePoolObject = null;
         }
     }
@@ -31,9 +31,9 @@ public class HitDamagePresenter : MonoBehaviour
 
     private void Start()
     {
-        // ƒIƒuƒWƒFƒNƒgƒv[ƒ‹‚ğæ“¾
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒ—ãƒ¼ãƒ«ã‚’å–å¾—
         hitDamagePool = hitDamagePoolObject.GetComponent<IObjectPool<HitDamageView>>();
-        // Œ³‚ÌƒLƒƒƒ“ƒoƒXæ“¾
+        // å…ƒã®ã‚­ãƒ£ãƒ³ãƒã‚¹å–å¾—
         rootCanvasTransform = canvasTransform.root.GetComponent<RectTransform>();
 
         StartCoroutine(StartProcess());
@@ -42,13 +42,14 @@ public class HitDamagePresenter : MonoBehaviour
     private IEnumerator StartProcess()
     {
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        // EntityManager‚Ì€”õ‚ªŠ®—¹‚·‚é‚Ì‚ğ‘Ò‚Â
+        // EntityManagerã®æº–å‚™ãŒå®Œäº†ã™ã‚‹ã®ã‚’å¾…ã¤
         yield return null;
 
-        // EntityQuery‚ğì¬‚·‚é
+        // EntityQueryã‚’ä½œæˆã™ã‚‹
         var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<HitDamageComponent>();
         query = entityManager.CreateEntityQuery(in entityQueryBuilder);
+
         WaitUntil waitUntil = new WaitUntil(() => query.CalculateEntityCount() != 0);
 
         while (true)
@@ -74,16 +75,16 @@ public class HitDamagePresenter : MonoBehaviour
 
     private void Show(HitDamageComponent hitDamage)
     {
-        // ƒIƒuƒWƒFƒNƒg‚ÌˆÊ’u‚ªƒJƒƒ‰‚Éû‚Ü‚é‚©’²‚×‚é
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½ç½®ãŒã‚«ãƒ¡ãƒ©ã«åã¾ã‚‹ã‹èª¿ã¹ã‚‹
         Vector3 targetDirection = (Vector3)hitDamage.Position - viewCamera.transform.position;
         float cameraDot = Vector3.Dot(targetDirection, viewCamera.transform.forward);
 
-        // ƒJƒƒ‰‚ÌŠO‚¾‚Á‚½‚çI—¹
+        // ã‚«ãƒ¡ãƒ©ã®å¤–ã ã£ãŸã‚‰çµ‚äº†
         if (cameraDot <= 0) { return; }
-
+        
         HitDamageView ui = hitDamagePool.Get();
 
-        // ƒ[ƒ‹ƒhÀ•W‚ğUI‚ÌÀ•W‚É•ÏŠ·‚·‚é
+        // ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‚’UIã®åº§æ¨™ã«å¤‰æ›ã™ã‚‹
         var screenPosition = viewCamera.WorldToScreenPoint(hitDamage.Position);
 
         screenPosition.y += 125;

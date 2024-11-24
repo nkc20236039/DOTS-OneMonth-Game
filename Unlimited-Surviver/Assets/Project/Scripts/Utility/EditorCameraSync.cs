@@ -19,7 +19,13 @@ public class EditorCameraSync : MonoBehaviour
     void Update()
     {
         // シーンビューが無ければ実行しない
-        if (SceneView.lastActiveSceneView.camera == null) { return; }
+        if (SceneView.lastActiveSceneView == null) { return; }
+        if (SceneView.lastActiveSceneView.camera != sceneCamera)
+        {
+            // カメラのインスタンスが異なれば新しく代入
+            sceneCamera = SceneView.lastActiveSceneView.camera;
+        }
+
         gameCamera.transform.position = sceneCamera.transform.position;
         gameCamera.transform.rotation = sceneCamera.transform.rotation;
         gameCamera.fieldOfView = sceneCamera.fieldOfView;

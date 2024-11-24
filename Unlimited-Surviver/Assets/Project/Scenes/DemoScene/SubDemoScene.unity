@@ -1228,6 +1228,9 @@ MonoBehaviour:
   rotationSpeed: 0.1
   avoidPower: 20
   avoidingTime: 0.25
+  firstNextLevelUpValue: 10
+  nextLevelUpMagnification: 1.2
+  gettableRange: 0.1
 --- !u!114 &846864118
 MonoBehaviour:
   m_ObjectHideFlags: 0
