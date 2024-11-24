@@ -19,16 +19,9 @@ public class EditorCameraSync : MonoBehaviour
     void Update()
     {
         // シーンビューが無ければ実行しない
-        if (sceneCamera == null) { return; }
+        if (SceneView.lastActiveSceneView.camera == null) { return; }
         gameCamera.transform.position = sceneCamera.transform.position;
         gameCamera.transform.rotation = sceneCamera.transform.rotation;
         gameCamera.fieldOfView = sceneCamera.fieldOfView;
-    }
-
-    private static System.Type GetTypeFromName(string name)
-    {
-        return System.AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .FirstOrDefault(type => type.FullName == name);
     }
 }
