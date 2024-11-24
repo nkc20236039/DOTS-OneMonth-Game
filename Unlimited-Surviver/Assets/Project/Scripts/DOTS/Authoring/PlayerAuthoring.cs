@@ -1,4 +1,4 @@
-using DOTS;
+ï»¿using DOTS;
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
@@ -8,13 +8,19 @@ namespace Mono
     public class PlayerAuthoring : MonoBehaviour
     {
         [SerializeField]
-        private float speed;    // ƒvƒŒƒCƒ„[‚Ì‘¬“x
+        private float speed;    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®é€Ÿåº¦
         [SerializeField]
-        private float rotationSpeed; // ‰ñ“]‚Ì‘¬“x
+        private float rotationSpeed; // å›è»¢ã®é€Ÿåº¦
         [SerializeField]
-        private float avoidPower;   // ‰ñ”ğ—Í
+        private float avoidPower;   // å›é¿åŠ›
         [SerializeField]
-        private float avoidingTime; // ‰ñ”ğ‚ª—LŒø‚ÈŠÔ
+        private float avoidingTime; // å›é¿ãŒæœ‰åŠ¹ãªæ™‚é–“
+        [SerializeField]
+        private float firstNextLevelUpValue;    // æœ€åˆã®ãƒ¬ãƒ™ãƒ«ã‚¢ãƒƒãƒ—ã«å¿…è¦ãªçµŒé¨“å€¤
+        [SerializeField]
+        private float nextLevelUpMagnification; // ãƒ¬ãƒ™ãƒ«ã‚¢ãƒƒãƒ—å€ç‡
+        [SerializeField]
+        private float gettableRange;    // çµŒé¨“å€¤ã‚’å–å¾—å¯èƒ½ãªç¯„å›²
 
         private class PlayerBaker : Baker<PlayerAuthoring>
         {
@@ -22,17 +28,26 @@ namespace Mono
             {
                 Entity player = GetEntity(TransformUsageFlags.None);
 
-                // ƒvƒŒƒCƒ„[‚ÉƒRƒ“ƒ|[ƒlƒ“ƒg‚ğ’Ç‰Á
+                // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’è¿½åŠ 
                 AddComponent(player, typeof(PlayerInputComponent));
                 AddComponent(player, new PlayerSingleton
                 {
                     Speed = authoring.speed,
                     RotationSpeed = authoring.rotationSpeed,
                 });
+                // å›é¿ã‚’è¿½åŠ 
                 AddComponent(player, new AvoidComponent
                 {
                     AvoidPower = authoring.avoidPower,
-                    AvoidingTime = authoring.avoidingTime
+                    AvoidingTime = authoring.avoidingTime,
+                });
+                // ãƒ¬ãƒ™ãƒ«ã‚’è¿½åŠ 
+                AddComponent(player, new LevelSingleton
+                {
+                    CurrentLevel = 1,
+                    NextLevelUpMagnification = authoring.nextLevelUpMagnification,
+                    NextLevelUpValue = authoring.firstNextLevelUpValue,
+                    GettableRange = authoring.gettableRange,
                 });
             }
         }

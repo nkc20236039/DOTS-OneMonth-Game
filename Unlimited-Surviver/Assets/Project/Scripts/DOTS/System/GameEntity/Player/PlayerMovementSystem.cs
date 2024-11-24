@@ -30,19 +30,6 @@ namespace DOTS
             }.ScheduleParallel(state.Dependency);
 
             state.Dependency.Complete();
-
-            var simulation = SystemAPI.GetSingleton<SimulationSingleton>();
-            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-
-            state.Dependency = new PlayerExpGetJob
-            {
-                Ecb = ecb,
-                ExpGroup = SystemAPI.GetComponentLookup<ExperienceOrbComponent>(true),
-                Player = SystemAPI.GetSingletonEntity<PlayerSingleton>(),
-            }.Schedule(simulation, state.Dependency);
-
-            state.Dependency.Complete();
         }
     }
 
@@ -96,31 +83,6 @@ namespace DOTS
 
             // 物理の回転を固定
             mass.InverseInertia = float3.zero;
-        }
-    }
-
-    [BurstCompile]
-    public partial struct PlayerExpGetJob : ICollisionEventsJob
-    {
-        [ReadOnly]
-        public ComponentLookup<ExperienceOrbComponent> ExpGroup;
-        [ReadOnly]
-        public Entity Player;
-        public EntityCommandBuffer Ecb;
-
-        public void Execute(CollisionEvent collisionEvent)
-        {
-            if ((collisionEvent.EntityA == Player || collisionEvent.EntityB == Player) && (ExpGroup.HasComponent(collisionEvent.EntityA) || ExpGroup.HasComponent(collisionEvent.EntityB)))
-            {
-                if (ExpGroup.HasComponent(collisionEvent.EntityA))
-                {
-                    Ecb.DestroyEntity(collisionEvent.EntityA);
-                }
-                if (ExpGroup.HasComponent(collisionEvent.EntityB))
-                {
-                    Ecb.DestroyEntity(collisionEvent.EntityB);
-                }
-            }
         }
     }
 }
