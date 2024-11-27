@@ -1228,8 +1228,8 @@ MonoBehaviour:
   rotationSpeed: 0.1
   avoidPower: 20
   avoidingTime: 0.25
-  firstNextLevelUpValue: 10
-  nextLevelUpMagnification: 1.2
+  firstNextLevelUpValue: 50
+  nextLevelUpIncrease: 12
   gettableRange: 0.1
 --- !u!114 &846864118
 MonoBehaviour:
@@ -1456,7 +1456,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 5990645879819930574, guid: 1fab642c7389280429afbbd7a0a5b776,
     type: 3}
-  shotInterval: 1
+  shotInterval: 0.1
   gunOffset: {x: 2, y: 1}
   muzzleOffset: {x: 0.5, y: 0}
 --- !u!4 &1041582153
@@ -1890,7 +1890,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnerType: 0
   SpawnRadius: 30
-  SpawnInterval: 3
+  SpawnInterval: 0.5
   enemyPrefab: {fileID: 3189935247336597887, guid: b268541902f22fa498fbd83007bb47eb,
     type: 3}
 --- !u!4 &1309196658

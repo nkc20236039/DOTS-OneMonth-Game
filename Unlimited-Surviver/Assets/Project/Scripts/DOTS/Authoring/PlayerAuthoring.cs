@@ -18,7 +18,7 @@ namespace Mono
         [SerializeField]
         private float firstNextLevelUpValue;    // 最初のレベルアップに必要な経験値
         [SerializeField]
-        private float nextLevelUpMagnification; // レベルアップ倍率
+        private float nextLevelUpIncrease; // レベルアップ倍率
         [SerializeField]
         private float gettableRange;    // 経験値を取得可能な範囲
 
@@ -45,7 +45,7 @@ namespace Mono
                 AddComponent(player, new LevelSingleton
                 {
                     CurrentLevel = 1,
-                    NextLevelUpMagnification = authoring.nextLevelUpMagnification,
+                    NextLevelUpIncrease = authoring.nextLevelUpIncrease,
                     NextLevelUpValue = authoring.firstNextLevelUpValue,
                     GettableRange = authoring.gettableRange,
                 });

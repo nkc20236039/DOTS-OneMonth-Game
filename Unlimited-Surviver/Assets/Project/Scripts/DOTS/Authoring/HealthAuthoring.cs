@@ -1,4 +1,4 @@
-using Unity.Entities;
+ï»¿using Unity.Entities;
 using UnityEngine;
 
 namespace DOTS
@@ -13,15 +13,16 @@ namespace DOTS
             public override void Bake(HealthAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.None);
-                // ‘Ì—ÍƒRƒ“ƒ|[ƒlƒ“ƒg’Ç‰Á
+                // ä½“åŠ›ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¿½åŠ 
                 AddComponent(entity, new HealthComponent
                 {
                     MaxHealth = authoring.maxHealth,
                     Health = authoring.maxHealth
                 });
-                // ƒ_ƒ[ƒWƒRƒ“ƒ|[ƒlƒ“ƒg’Ç‰Á
+                // ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¿½åŠ 
                 AddComponent(entity, new HitDamageComponent());
-                SetComponentEnabled<HitDamageComponent>(entity, false);
+                AddComponent(entity, new DisplayOnUITag());
+                SetComponentEnabled<DisplayOnUITag>(entity, false);
             }
         }
     }

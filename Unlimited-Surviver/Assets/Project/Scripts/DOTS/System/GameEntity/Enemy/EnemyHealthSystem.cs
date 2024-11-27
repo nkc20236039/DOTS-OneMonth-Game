@@ -1,8 +1,6 @@
 ﻿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Physics;
 using Unity.Transforms;
 
 namespace DOTS
@@ -29,9 +27,7 @@ namespace DOTS
                 .WithEntityAccess())
             {
                 // ダメージを受けていれば体力を減少させる
-                bool isDamageEnable = state.EntityManager
-                    .IsComponentEnabled<HitDamageComponent>(entity);
-                if (isDamageEnable && !hitDamage.ValueRO.IsDistributed)
+                if (!hitDamage.ValueRO.IsDistributed)
                 {
                     health.ValueRW.Health -= hitDamage.ValueRO.DamageValue;
                     hitDamage.ValueRW.IsDistributed = true;

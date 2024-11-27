@@ -1,11 +1,11 @@
-using Unity.Burst;
+ï»¿using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 
 namespace DOTS
 {
     /// <summary>
-    /// ƒvƒŒƒCƒ„[‚Ì‰ñ”ğˆ—‚ğ’Ç‰Á
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å›é¿å‡¦ç†ã‚’è¿½åŠ 
     /// </summary>
     [UpdateInGroup(typeof(InputUpdateGroup))]
     [BurstCompile]
@@ -25,10 +25,10 @@ namespace DOTS
             {
                 if (avoid.ValueRO.IsAvoiding) { return; }
 
-                // ‰ñ”ğó‘Ô‚É‚·‚é
+                // å›é¿çŠ¶æ…‹ã«ã™ã‚‹
                 avoid.ValueRW.IsAvoiding = input.ValueRO.IsAvoidInput;
 
-                // •ûŒü‚ğw’è
+                // æ–¹å‘ã‚’æŒ‡å®š
                 float3 direction = new
                 (
                     input.ValueRO.MoveDirection.x,

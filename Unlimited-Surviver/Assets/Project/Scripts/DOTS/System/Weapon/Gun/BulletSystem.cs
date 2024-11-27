@@ -1,4 +1,4 @@
-using Unity.Burst;
+ï»¿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -20,12 +20,12 @@ namespace DOTS
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
-            // Job‚É“n‚·‚à‚Ì‚Ì€”õ
+            // Jobã«æ¸¡ã™ã‚‚ã®ã®æº–å‚™
             var simulation = SystemAPI.GetSingleton<SimulationSingleton>();
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            // Õ“Ë”»’è‚ÌJob‚ğì¬
+            // è¡çªåˆ¤å®šã®Jobã‚’ä½œæˆ
             state.Dependency = new BulletTriggerJob
             {
                 Ecb = ecb,
@@ -35,24 +35,24 @@ namespace DOTS
                 Transform = SystemAPI.GetComponentLookup<LocalTransform>(true),
             }.Schedule(simulation, state.Dependency);
 
-            // Õ“Ë”»’èJob‚ªI—¹‚·‚é‚±‚Æ‚ğ‘Ò‹@
+            // è¡çªåˆ¤å®šJobãŒçµ‚äº†ã™ã‚‹ã“ã¨ã‚’å¾…æ©Ÿ
             state.Dependency.Complete();
 
-            // ¶‘¶’†‚Ì’e‚ğŠÇ—‚·‚éJob‚ğì¬
+            // ç”Ÿå­˜ä¸­ã®å¼¾ã‚’ç®¡ç†ã™ã‚‹Jobã‚’ä½œæˆ
             state.Dependency = new BulletJob
             {
                 DeltaTime = SystemAPI.Time.DeltaTime,
                 ParallelEcb = ecb.AsParallelWriter()
             }.ScheduleParallel(state.Dependency);
 
-            // Job‚ÌŒãˆ—
+            // Jobã®å¾Œå‡¦ç†
             state.Dependency.Complete();
             JobHandle.ScheduleBatchedJobs();
         }
     }
 
     /// <summary>
-    /// e’e‚ÌŠî–{‹““®
+    /// éŠƒå¼¾ã®åŸºæœ¬æŒ™å‹•
     /// </summary>
     [BurstCompile]
     public partial struct BulletJob : IJobEntity
@@ -66,23 +66,23 @@ namespace DOTS
             ref BulletComponent bullet,
             ref LocalTransform transform)
         {
-            // ŠÔ‚ğŒo‰ß‚³‚¹‚é
+            // æ™‚é–“ã‚’çµŒéã•ã›ã‚‹
             bullet.Age += DeltaTime;
             if (bullet.Lifetime > bullet.Age)
             {
-                // ¶‘¶ŠúŠÔ‚Í’¼i‚³‚¹‚é
+                // ç”Ÿå­˜æœŸé–“ã¯ç›´é€²ã•ã›ã‚‹
                 transform.Position += math.forward(transform.Rotation) * bullet.Speed * DeltaTime;
             }
             else
             {
-                // ¶‘¶ŠÔ‚ğ‰ß‚¬‚½‚çíœ‚·‚é
+                // ç”Ÿå­˜æ™‚é–“ã‚’éããŸã‚‰å‰Šé™¤ã™ã‚‹
                 ParallelEcb.DestroyEntity(index, entity);
             }
         }
     }
 
     /// <summary>
-    /// e’e‚ÌÕ“Ë”»’è
+    /// éŠƒå¼¾ã®è¡çªåˆ¤å®š
     /// </summary>
     [BurstCompile]
     public partial struct BulletTriggerJob : ITriggerEventsJob
@@ -95,45 +95,44 @@ namespace DOTS
 
         public void Execute(TriggerEvent triggerEvent)
         {
-            // ŠÂ‹«‚Æ’e
+            // ç’°å¢ƒã¨å¼¾
             (bool IsHit, Entity bullet, Entity environment) environmentInfo
                 = CollisionResponseExplicit.TriggerEvent(triggerEvent, BulletGroup, EnvironmentGroup);
-            // ƒQ[ƒ€ƒGƒ“ƒeƒBƒeƒB‚Æ’e
+            // ã‚²ãƒ¼ãƒ ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã¨å¼¾
             (bool IsHit, Entity bullet, Entity gameEntity) gameEntityInfo
                 = CollisionResponseExplicit.TriggerEvent(triggerEvent, BulletGroup, GameEntityGroup);
 
             if (environmentInfo.IsHit)
             {
-                // ŠÂ‹«‚Æ’e‚ª“–‚½‚Á‚½ê‡
-                // B‚ªe’e‚Æ‚í‚©‚é‚½‚ßB‚ğíœ
+                // ç’°å¢ƒã¨å¼¾ãŒå½“ãŸã£ãŸå ´åˆ
+                // BãŒéŠƒå¼¾ã¨ã‚ã‹ã‚‹ãŸã‚Bã‚’å‰Šé™¤
                 Ecb.DestroyEntity(environmentInfo.bullet);
             }
 
             if (gameEntityInfo.IsHit)
             {
-                // •K—v‚ÈƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾
+                // å¿…è¦ãªã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—
                 HitDamageComponent hitDamage;
                 BulletComponent bullet;
                 if (GameEntityGroup.TryGetComponent(gameEntityInfo.gameEntity, out hitDamage) == false) { return; }
                 if (BulletGroup.TryGetComponent(gameEntityInfo.bullet, out bullet) == false) { return; }
 
-                // DamageComponent‚ğŠ‚µ‚Ä‚¢‚éƒGƒ“ƒeƒBƒeƒB‚ªBullet‚Ì”­Ëå‚¾‚Á‚½‚çƒ_ƒ[ƒWˆ—‚ğ‚µ‚È‚¢
+                // DamageComponentã‚’æ‰€æŒã—ã¦ã„ã‚‹ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãŒBulletã®ç™ºå°„ä¸»ã ã£ãŸã‚‰ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†ã‚’ã—ãªã„
                 if (gameEntityInfo.gameEntity == bullet.Owner) { return; }
-                // ”­Ëå‚ªƒ`[ƒ€‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚ğŠ‚µ‚Ä‚¢‚½‚ç‚»‚Ìƒ`[ƒ€‚Æ‚ÌÕ“Ë”»’è‚à–³‹‚·‚é
+                // ç™ºå°„ä¸»ãŒãƒãƒ¼ãƒ ã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’æ‰€æŒã—ã¦ã„ãŸã‚‰ãã®ãƒãƒ¼ãƒ ã¨ã®è¡çªåˆ¤å®šã‚‚ç„¡è¦–ã™ã‚‹
 
-                // “–‚½‚Á‚½‘Šè‚Éƒ_ƒ[ƒW‚Ìî•ñ‚ğ—^‚¦‚é
+                // å½“ãŸã£ãŸç›¸æ‰‹ã«ãƒ€ãƒ¡ãƒ¼ã‚¸ã®æƒ…å ±ã‚’ä¸ãˆã‚‹
                 LocalTransform transform;
                 if (Transform.TryGetComponent(gameEntityInfo.gameEntity, out transform) == false) { return; }
-                Ecb.SetComponentEnabled<HitDamageComponent>(gameEntityInfo.gameEntity, true);
+                Ecb.SetComponentEnabled<DisplayOnUITag>(gameEntityInfo.gameEntity, true);
                 Ecb.SetComponent(gameEntityInfo.gameEntity, new HitDamageComponent
                 {
-                    IsUIShowing = false,
                     IsDistributed = false,
                     DamageValue = bullet.AttackDamage,
                     Position = transform.Position,
                 });
 
-                // ’e‚ğíœ‚·‚é
+                // å¼¾ã‚’å‰Šé™¤ã™ã‚‹
                 Ecb.DestroyEntity(gameEntityInfo.bullet);
             }
         }

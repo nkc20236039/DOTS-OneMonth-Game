@@ -1,22 +1,24 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public sealed class DamageUIPool : MonoBehaviour, IObjectPool<HitDamageView>
 {
-    [SerializeField]    // ƒ_ƒ[ƒWUI‚ÌƒvƒŒƒnƒu
+    [SerializeField]    // ãƒ€ãƒ¡ãƒ¼ã‚¸UIã®ãƒ—ãƒ¬ãƒãƒ–
     private HitDamageView damagePrefab;
-    [SerializeField]    // ƒv[ƒ‹‚Ì‰ŠúƒTƒCƒY
+    [SerializeField]    // ãƒ—ãƒ¼ãƒ«ã®åˆæœŸã‚µã‚¤ã‚º
     private int poolSize = 10;
+    [SerializeField]
+    private Camera viewCamera;
 
-    // ƒIƒuƒWƒFƒNƒgƒv[ƒ‹
+    // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒ—ãƒ¼ãƒ«
     private Queue<HitDamageView> pool;
 
     private void Awake()
     {
-        // ƒv[ƒ‹‚Ì¶¬
+        // ãƒ—ãƒ¼ãƒ«ã®ç”Ÿæˆ
         pool = new Queue<HitDamageView>();
 
-        // ƒv[ƒ‹‚ğ‰Šú‰»
+        // ãƒ—ãƒ¼ãƒ«ã‚’åˆæœŸåŒ–
         for (int i = 0; i < poolSize; i++)
         {
             CreateNewDamageView();
@@ -24,17 +26,17 @@ public sealed class DamageUIPool : MonoBehaviour, IObjectPool<HitDamageView>
     }
 
     /// <summary>
-    /// g—p‚³‚ê‚Ä‚¢‚È‚¢ƒrƒ…[‚ğæ“¾‚µ‚Ü‚·
+    /// ä½¿ç”¨ã•ã‚Œã¦ã„ãªã„ãƒ“ãƒ¥ãƒ¼ã‚’å–å¾—ã—ã¾ã™
     /// </summary>
     /// <returns></returns>
     public HitDamageView Get()
     {
         if (pool.Count == 0)
         {
-            // ƒv[ƒ‹‚ª‹ó‚È‚çV‚µ‚­ì¬
+            // ãƒ—ãƒ¼ãƒ«ãŒç©ºãªã‚‰æ–°ã—ãä½œæˆ
             CreateNewDamageView();
         }
-        // ƒIƒuƒWƒFƒNƒg‚ğ—˜—p‰Â”\‚É‚·‚é
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’åˆ©ç”¨å¯èƒ½ã«ã™ã‚‹
         HitDamageView damageView = pool.Dequeue();
         damageView.gameObject.SetActive(true);
 
@@ -42,23 +44,24 @@ public sealed class DamageUIPool : MonoBehaviour, IObjectPool<HitDamageView>
     }
 
     /// <summary>
-    /// ƒIƒuƒWƒFƒNƒg‚ğƒv[ƒ‹‚É•ÔŠÒ‚µ‚Ü‚·
+    /// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ—ãƒ¼ãƒ«ã«è¿”é‚„ã—ã¾ã™
     /// </summary>
     /// <param name="damageView"></param>
     public void Return(HitDamageView damageView)
     {
-        // ƒIƒuƒWƒFƒNƒg‚ğƒv[ƒ‹‚É•ÛŠÇ‚·‚é
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ—ãƒ¼ãƒ«ã«ä¿ç®¡ã™ã‚‹
         damageView.gameObject.SetActive(false);
         pool.Enqueue(damageView);
     }
 
     /// <summary>
-    /// V‚µ‚­ƒIƒuƒWƒFƒNƒg‚ğì¬‚µ‚Ü‚·
+    /// æ–°ã—ãã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã—ã¾ã™
     /// </summary>
     /// <returns></returns>
     private HitDamageView CreateNewDamageView()
     {
         HitDamageView damageView = Instantiate(damagePrefab, transform);
+        damageView.Initalize(viewCamera, this);
         damageView.gameObject.SetActive(false);
         pool.Enqueue(damageView);
 

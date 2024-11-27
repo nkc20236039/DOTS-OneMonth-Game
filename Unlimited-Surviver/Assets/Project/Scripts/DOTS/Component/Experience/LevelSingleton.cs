@@ -4,7 +4,7 @@ namespace DOTS
 {
     public struct LevelSingleton : IComponentData
     {
-        public float NextLevelUpMagnification;  // 次のレベルへの倍率
+        public float NextLevelUpIncrease;  // 次のレベルへの倍率
         public float NextLevelUpValue;  // 次のレベルアップまでの数
         public float GettableRange;
 

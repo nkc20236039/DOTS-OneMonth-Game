@@ -59,6 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiText: {fileID: 8747056541372862378}
+  uiOffset: {x: 0, y: 125}
   displayTime: 1
 --- !u!114 &8747056541372862378
 MonoBehaviour:

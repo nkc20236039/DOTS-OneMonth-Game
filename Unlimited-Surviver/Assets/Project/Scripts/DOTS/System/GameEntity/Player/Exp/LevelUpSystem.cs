@@ -42,7 +42,7 @@ namespace DOTS
             // レベルを加算
             level.ValueRW.CurrentLevel++;
             // 次のレベルアップを決定
-            level.ValueRW.NextLevelUpValue *= level.ValueRO.NextLevelUpMagnification;
+            level.ValueRW.NextLevelUpValue += level.ValueRO.NextLevelUpIncrease;
         }
     }
 }

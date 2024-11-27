@@ -1,13 +1,12 @@
-using Unity.Entities;
+ï»¿using Unity.Entities;
 using Unity.Mathematics;
 
 namespace DOTS
 {
-    public struct HitDamageComponent : IComponentData, IEnableableComponent
+    public struct HitDamageComponent : IComponentData
     {
-        public bool IsUIShowing;    // UI‚É•\¦’†‚©
-        public bool IsDistributed;  // ƒ_ƒ[ƒW‚ğ—^‚¦‚½‚©
-        public float DamageValue;   // ƒ_ƒ[ƒW’l
-        public float3 Position;     // ƒ_ƒ[ƒW‚ª—^‚¦‚ç‚ê‚½À•W
+        public bool IsDistributed;  // ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’ä¸ãˆãŸã‹
+        public float DamageValue;   // ãƒ€ãƒ¡ãƒ¼ã‚¸å€¤
+        public float3 Position;     // ãƒ€ãƒ¡ãƒ¼ã‚¸ãŒä¸ãˆã‚‰ã‚ŒãŸåº§æ¨™
     }
 }
