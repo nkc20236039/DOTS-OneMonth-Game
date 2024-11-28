@@ -1,4 +1,4 @@
-using Unity.Burst;
+ï»¿using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -18,7 +18,9 @@ namespace DOTS
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
-            // ƒvƒŒƒCƒ„[‚ğæ“¾
+            if (SystemAPI.Time.DeltaTime == 0) { return; }
+
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’å–å¾—
             var player = SystemAPI.GetSingletonEntity<PlayerSingleton>();
             var playerTransform = SystemAPI.GetComponent<LocalToWorld>(player);
             var playerWorld = SystemAPI.GetComponent<LocalToWorld>(player);
@@ -41,25 +43,25 @@ namespace DOTS
 
         private void Execute(ref WeaponComponent weapon, ref LocalTransform transform)
         {
-            // ƒ^[ƒQƒbƒg‚Ì•ûŒü‚ğŒü‚­
+            // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æ–¹å‘ã‚’å‘ã
             var rotation = quaternion.LookRotationSafe(weapon.TargetDirection, math.up());
             transform.Rotation = math.mul(math.inverse(PlayerWorld.Rotation), rotation);
 
-            // ƒvƒŒƒCƒ„[‚©‚ç‚ÌƒIƒtƒZƒbƒg‚ğì¬
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‹ã‚‰ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’ä½œæˆ
             var offset
                 = math.forward(transform.Rotation)
                 * weapon.Offset.x;
-            // YÀ•WƒIƒtƒZƒbƒg‚ğİ’è
+            // Yåº§æ¨™ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’è¨­å®š
             offset.y += weapon.Offset.y;
             transform.Position = offset;
 
-            // ƒ[ƒ‹ƒhÀ•W—p‚ÌƒIƒtƒZƒbƒg‚ğì¬
+            // ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç”¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’ä½œæˆ
             var worldOffset
                 = math.forward(rotation)
                 * weapon.Offset.x;
             worldOffset.y += weapon.Offset.y;
 
-            // ƒ[ƒ‹ƒhî•ñ‚ğ•Û‘¶
+            // ãƒ¯ãƒ¼ãƒ«ãƒ‰æƒ…å ±ã‚’ä¿å­˜
             weapon.WorldPosition = PlayerPosition + worldOffset;
             weapon.WorldRotation = rotation;
         }

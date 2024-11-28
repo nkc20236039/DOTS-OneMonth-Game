@@ -4,7 +4,6 @@ using TMPro;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class HitDamageView : MonoBehaviour
 {
@@ -28,6 +27,7 @@ public class HitDamageView : MonoBehaviour
 
         // DOTSWorldから取得
         var world = World.DefaultGameObjectInjectionWorld;
+
         var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<CompletedEventManagedSingleton>();
         var completedEvent = world.EntityManager.CreateEntityQuery(entityQueryBuilder).GetSingletonRW<CompletedEventManagedSingleton>();

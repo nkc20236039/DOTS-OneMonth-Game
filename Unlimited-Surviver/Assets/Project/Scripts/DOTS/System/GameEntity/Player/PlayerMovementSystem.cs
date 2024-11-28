@@ -24,6 +24,8 @@ namespace DOTS
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
+            if (SystemAPI.Time.DeltaTime == 0) { return; }
+
             state.Dependency = new PlayerMovementJob
             {
                 Player = SystemAPI.GetSingleton<PlayerSingleton>()
