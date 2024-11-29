@@ -6,11 +6,13 @@ namespace DOTS
     [BurstCompile]
     public partial struct LevelUpSystem : ISystem
     {
+        [BurstCompile]
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
             state.RequireForUpdate<LevelSingleton>();
         }
 
+        [BurstCompile]
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
             foreach (var level in SystemAPI.Query<RefRW<LevelSingleton>>())
@@ -37,6 +39,7 @@ namespace DOTS
             }
         }
 
+        [BurstCompile]
         private void LevelUp(RefRW<LevelSingleton> level)
         {
             // レベルを加算

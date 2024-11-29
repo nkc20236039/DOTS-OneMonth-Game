@@ -1,8 +1,10 @@
-﻿using Unity.Entities;
+﻿using Unity.Burst;
+using Unity.Entities;
 using Unity.Physics;
 
 namespace UnityPhysicsExpansion
 {
+    [BurstCompile]
     public struct CollisionResponseExplicit
     {
         /// <summary>
@@ -14,6 +16,7 @@ namespace UnityPhysicsExpansion
         /// <param name="selfGroup">自分側のコンポーネントグループ</param>
         /// <param name="opponentGroup">相手側のコンポーネントグループ</param>
         /// <returns></returns>
+        [BurstCompile]
         public static (bool IsHit, Entity self, Entity opponent) TriggerEvent<Self, Opponent>(
             TriggerEvent triggerEvent,
             ComponentLookup<Self> selfGroup,
@@ -43,7 +46,8 @@ namespace UnityPhysicsExpansion
         /// <param name="triggerEvent">トリガーイベント</param>
         /// <param name="selfEntity">自分側のエンティティ</param>
         /// <param name="opponentGroup">相手側のコンポーネントグループ</param>
-        /// <returns></returns>
+        /// <returns></returns
+        [BurstCompile]
         public static (bool IsHit, Entity self, Entity opponent) TriggerEvent<Opponent>(
             TriggerEvent triggerEvent,
             Entity selfEntity,
@@ -73,6 +77,7 @@ namespace UnityPhysicsExpansion
         /// <param name="selfGroup">自分側のコンポーネントグループ</param>
         /// <param name="opponentEntity">相手側のエンティティ</param>
         /// <returns></returns>
+        [BurstCompile]
         public static (bool IsHit, Entity self, Entity opponent) TriggerEvent<Self>(
             TriggerEvent triggerEvent,
             ComponentLookup<Self> selfGroup,
@@ -103,6 +108,7 @@ namespace UnityPhysicsExpansion
         /// <param name="selfGroup">自分側のコンポーネントグループ</param>
         /// <param name="opponentGroup">相手側のコンポーネントグループ</param>
         /// <returns></returns>
+        [BurstCompile]
         public static (bool IsHit, Entity self, Entity opponent) CollisionEvent<Self, Opponent>(
             CollisionEvent collisionEvent,
             ComponentLookup<Self> selfGroup,
@@ -133,6 +139,7 @@ namespace UnityPhysicsExpansion
         /// <param name="selfEntity">自分側のエンティティ</param>
         /// <param name="opponentGroup">相手側のコンポーネントグループ</param>
         /// <returns></returns>
+        [BurstCompile]
         public static (bool IsHit, Entity self, Entity opponent) CollisionEvent<Opponent>(
             CollisionEvent collisionEvent,
             Entity selfEntity,
@@ -162,6 +169,7 @@ namespace UnityPhysicsExpansion
         /// <param name="selfGroup">自分側のコンポーネントグループ</param>
         /// <param name="opponentEntity">相手側のエンティティ</param>
         /// <returns></returns>
+        [BurstCompile]
         public static (bool IsHit, Entity self, Entity opponent) CollisionEvent<Self>(
             CollisionEvent collisionEvent,
             ComponentLookup<Self> selfGroup,
