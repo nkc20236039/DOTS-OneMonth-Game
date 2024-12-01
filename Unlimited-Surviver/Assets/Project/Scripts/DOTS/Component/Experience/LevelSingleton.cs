@@ -10,6 +10,7 @@ namespace DOTS
 
         public float AdditionExp;       // 加算された経験値
 
+        public bool IsLevelUp;      // レベルアップが実行されたか
         public int CurrentLevel;    // 現在のレベル
         public float CurrentExp;    // 現在のEXP(経験値)
     }

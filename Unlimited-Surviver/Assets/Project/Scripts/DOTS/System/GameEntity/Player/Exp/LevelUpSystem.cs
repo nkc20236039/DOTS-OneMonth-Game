@@ -44,6 +44,7 @@ namespace DOTS
         {
             // レベルを加算
             level.ValueRW.CurrentLevel++;
+            level.ValueRW.IsLevelUp = true;
             // 次のレベルアップを決定
             level.ValueRW.NextLevelUpValue += level.ValueRO.NextLevelUpIncrease;
         }

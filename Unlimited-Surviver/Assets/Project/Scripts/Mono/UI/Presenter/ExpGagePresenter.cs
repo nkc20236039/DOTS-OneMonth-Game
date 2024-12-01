@@ -41,9 +41,6 @@ namespace Mono
             // EntityQueryを作成する
             var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<LevelSingleton>();
-            level = entityManager
-                .CreateEntityQuery(in entityQueryBuilder)
-                .GetSingleton<LevelSingleton>();
 
             // Queryをリセットしてイベントシングルトンを追加
             entityQueryBuilder
