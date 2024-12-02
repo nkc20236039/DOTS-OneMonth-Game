@@ -48,7 +48,7 @@ namespace Mono
                 if (enhancementData.IsAwake)
                 {
                     // 最初から必要なコンポーネントを追加する
-                    AddOrSetEnhancementComponent(enhancementData);
+                    AddOrSetEnhancementComponent(enhancementData, true);
                 }
             }
         }
@@ -56,10 +56,16 @@ namespace Mono
         /// <summary>
         /// 強化するコンポーネントデータを追加もしくは上書きします
         /// </summary>
-        private void AddOrSetEnhancementComponent(EnhancementData enhancementData)
+        private void AddOrSetEnhancementComponent(EnhancementData enhancementData, bool isInit = false)
         {
             for (int i = 0; i < enhancementBuffer.Length; i++)
             {
+                if (isInit)
+                {
+                    // 初期化する場合は強化処理を行わない
+                    break;
+                }
+
                 if (enhancementBuffer[i].EnhancementType == enhancementData.EnhancementType)
                 {
                     // 強化後の数値を計算する
@@ -70,6 +76,8 @@ namespace Mono
                             enhancementData.EnhancementValue,
                             enhancementData.CalculationType
                         );
+
+                    Debug.Log($"{enhancementData.EnhancementType}が存在しているため強化しました。\n{enhancementBuffer[i].Value}から{enhancementedValue}へ強化")
 
                     // 新しい強化コンポーネントがBuffer内に存在していたら書き換える
                     enhancementBuffer[i] = new EnhancementComponent
@@ -88,6 +96,7 @@ namespace Mono
                 EnhancementType = enhancementData.EnhancementType,
                 Value = enhancementData.FirstValue,
             });
+            Debug.Log($"{enhancementData.EnhancementType}を新規追加しました。\n初期値: {enhancementData.FirstValue}");
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SpeedUp 2
   m_EditorClassIdentifier: 
   enhancementType: 0
-  isAwake: 1
+  isAwake: 0
   firstValue: 5
   calculationType: 2
   enhancementValue: 5
