@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44039ac186bd3e040aaa621386b460f8, type: 3}
+  m_Name: SpeedUp
+  m_EditorClassIdentifier: 
+  enhancementType: 0
+  isAwake: 1
+  firstValue: 5
+  calculationType: 2
+  enhancementValue: 5
+  enhancementTitle: "\u79FB\u52D5\u901F\u5EA6\u4E0A\u6607"
+  enhancementIcon: {fileID: 0}
+  enhancementDescription: "\u79FB\u52D5\u901F\u5EA6\u304C5\uFF05\u4E0A\u6607\u3057\u307E\u3059"

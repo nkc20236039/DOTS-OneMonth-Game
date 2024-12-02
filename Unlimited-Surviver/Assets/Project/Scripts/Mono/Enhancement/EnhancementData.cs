@@ -15,7 +15,7 @@ public enum EnhancementCalculation
     PercentIncrease,
 }
 
-namespace DOTS
+namespace Mono
 {
     //TODO: バッファーコンポーネントで管理
     [CreateAssetMenu(menuName = "ScriptableObject/EnhancementData")]
@@ -33,27 +33,20 @@ namespace DOTS
         private float enhancementValue;
         [Space]
         [Header("UI")]
-        [SerializeField]    // UIのベースプレハブ
-        private GameObject uiPanelPrefab;
-        [SerializeField]    // 表示確率
-        [Range(0, 100)]
-        private float displayProbability;
         [SerializeField]    // 強化名
-        private string enhancementName;
+        private string enhancementTitle;
         [SerializeField]    // イメージアイコン
         private Sprite enhancementIcon;
         [SerializeField]    // 説明文
-        private string enhancementText;
+        private string enhancementDescription;
 
         public EnhancementContents EnhancementType => enhancementType;
         public bool IsAwake => isAwake;
         public float FirstValue => firstValue;
         public EnhancementCalculation CalculationType => calculationType;
         public float EnhancementValue => enhancementValue;
-        public GameObject UiPanelPrefab => uiPanelPrefab;
-        public float DisplayProbability => displayProbability;
-        public string EnhancementName => enhancementName;
+        public string EnhancementTitle => enhancementTitle;
         public Sprite EnhancementIcon => enhancementIcon;
-        public string EnhancementText => enhancementText;
+        public string EnhancementDescription => enhancementDescription;
     }
 }

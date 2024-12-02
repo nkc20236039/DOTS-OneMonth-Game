@@ -9,7 +9,7 @@ namespace Mono
     public class Enhancement : MonoBehaviour
     {
         [SerializeField]
-        private EnhancementData[] enhancementDataCollection;
+        private EnhancementDecideData enhancementDecide;
 
         private EntityManager entityManager;
         private PlayerSingleton player;
@@ -43,7 +43,7 @@ namespace Mono
             enhancementBuffer = entityManager
                 .AddBuffer<EnhancementComponent>(playerEntity);
 
-            foreach (var enhancementData in enhancementDataCollection)
+            foreach (var enhancementData in enhancementDecide.enhancementDataCollection)
             {
                 if (enhancementData.IsAwake)
                 {
