@@ -4,10 +4,8 @@ using Unity.Entities;
 
 namespace DOTS
 {
-    [BurstCompile]
     public struct EnhancemetTypeGetter
     {
-        [BurstCompile]
         public struct EnhancementResult
         {
             private bool isFound;

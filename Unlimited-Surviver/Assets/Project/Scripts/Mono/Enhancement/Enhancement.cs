@@ -77,7 +77,7 @@ namespace Mono
                             enhancementData.CalculationType
                         );
 
-                    Debug.Log($"{enhancementData.EnhancementType}が存在しているため強化しました。\n{enhancementBuffer[i].Value}から{enhancementedValue}へ強化")
+                    Debug.Log($"{enhancementData.EnhancementType}が存在しているため強化しました。\n{enhancementBuffer[i].Value}から{enhancementedValue}へ強化");
 
                     // 新しい強化コンポーネントがBuffer内に存在していたら書き換える
                     enhancementBuffer[i] = new EnhancementComponent
