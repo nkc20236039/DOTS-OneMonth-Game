@@ -14,7 +14,7 @@ namespace DOTS
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
-            state.RequireForUpdate<BulletComponent>();
+            state.RequireForUpdate<BulletParameterComponent>();
             state.RequireForUpdate<HealthComponent>();
         }
 
@@ -31,6 +31,7 @@ namespace DOTS
                 Ecb = ecb,
                 EnvironmentGroup = SystemAPI.GetComponentLookup<EnvironmentTag>(true),
                 GameEntityGroup = SystemAPI.GetComponentLookup<HitDamageComponent>(true),
+                BulletParameterGroup = SystemAPI.GetComponentLookup<BulletParameterComponent>(true),
                 BulletGroup = SystemAPI.GetComponentLookup<BulletComponent>(true),
                 Transform = SystemAPI.GetComponentLookup<LocalTransform>(true),
             }.Schedule(simulation, state.Dependency);
@@ -63,7 +64,7 @@ namespace DOTS
         private void Execute(
             [EntityIndexInQuery] int index,
             Entity entity,
-            ref BulletComponent bullet,
+            ref BulletParameterComponent bullet,
             ref LocalTransform transform)
         {
             // 時間を経過させる
@@ -90,6 +91,7 @@ namespace DOTS
         public EntityCommandBuffer Ecb;
         [ReadOnly] public ComponentLookup<EnvironmentTag> EnvironmentGroup;
         [ReadOnly] public ComponentLookup<HitDamageComponent> GameEntityGroup;
+        [ReadOnly] public ComponentLookup<BulletParameterComponent> BulletParameterGroup;
         [ReadOnly] public ComponentLookup<BulletComponent> BulletGroup;
         [ReadOnly] public ComponentLookup<LocalTransform> Transform;
 
@@ -97,10 +99,10 @@ namespace DOTS
         {
             // 環境と弾
             (bool IsHit, Entity bullet, Entity environment) environmentInfo
-                = CollisionResponseExplicit.TriggerEvent(triggerEvent, BulletGroup, EnvironmentGroup);
+                = CollisionResponseExplicit.TriggerEvent(triggerEvent, BulletParameterGroup, EnvironmentGroup);
             // ゲームエンティティと弾
             (bool IsHit, Entity bullet, Entity gameEntity) gameEntityInfo
-                = CollisionResponseExplicit.TriggerEvent(triggerEvent, BulletGroup, GameEntityGroup);
+                = CollisionResponseExplicit.TriggerEvent(triggerEvent, BulletParameterGroup, GameEntityGroup);
 
             if (environmentInfo.IsHit)
             {
@@ -113,8 +115,10 @@ namespace DOTS
             {
                 // 必要なコンポーネントを取得
                 HitDamageComponent hitDamage;
+                BulletParameterComponent bulletParameter;
                 BulletComponent bullet;
                 if (GameEntityGroup.TryGetComponent(gameEntityInfo.gameEntity, out hitDamage) == false) { return; }
+                if (BulletParameterGroup.TryGetComponent(gameEntityInfo.bullet, out bulletParameter) == false) { return; }
                 if (BulletGroup.TryGetComponent(gameEntityInfo.bullet, out bullet) == false) { return; }
 
                 // DamageComponentを所持しているエンティティがBulletの発射主だったらダメージ処理をしない
@@ -128,7 +132,7 @@ namespace DOTS
                 Ecb.SetComponent(gameEntityInfo.gameEntity, new HitDamageComponent
                 {
                     IsDistributed = false,
-                    DamageValue = bullet.AttackDamage,
+                    DamageValue = bulletParameter.AttackDamage,
                     Position = transform.Position,
                 });
 

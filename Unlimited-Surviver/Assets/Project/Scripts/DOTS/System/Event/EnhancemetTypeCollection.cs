@@ -4,7 +4,7 @@ using Unity.Entities;
 
 namespace DOTS
 {
-    public struct EnhancemetTypeGetter
+    public struct EnhancemetTypeCollection
     {
         public struct EnhancementResult
         {
@@ -24,13 +24,13 @@ namespace DOTS
         }
 
         [BurstCompile]
-        public static EnhancementResult GetEnhancementValue(EntityManager entityManager, EnhancementContents enhancementType)
+        public static EnhancementResult GetEnhancementValue(EnhancementContents enhancementType, EntityManager entityManager)
         {
             var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<PlayerSingleton, EnhancementComponent>();
+                .WithAll<PlayerSingleton, EnhancementBuffer>();
             var enhancementBuffer = entityManager
                 .CreateEntityQuery(entityQueryBuilder)
-                .GetSingletonBuffer<EnhancementComponent>();
+                .GetSingletonBuffer<EnhancementBuffer>();
 
             foreach (var enhancement in enhancementBuffer)
             {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DOTS
 {
-    public struct EnhancementComponent : IBufferElementData
+    public struct EnhancementBuffer : IBufferElementData
     {
         public EnhancementContents EnhancementType;
         public float Value;

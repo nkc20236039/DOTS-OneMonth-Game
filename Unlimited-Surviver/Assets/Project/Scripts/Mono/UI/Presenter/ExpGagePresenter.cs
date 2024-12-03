@@ -26,9 +26,10 @@ namespace Mono
             // 表示
             var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<LevelSingleton>();
-            level = entityManager
+
+            entityManager
                 .CreateEntityQuery(in entityQueryBuilder)
-                .GetSingleton<LevelSingleton>();
+                .TryGetSingleton(out level);
             Show(level);
         }
 

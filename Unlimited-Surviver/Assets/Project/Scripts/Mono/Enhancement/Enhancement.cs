@@ -13,7 +13,7 @@ namespace Mono
 
         private EntityManager entityManager;
         private PlayerSingleton player;
-        private DynamicBuffer<EnhancementComponent> enhancementBuffer;
+        private DynamicBuffer<EnhancementBuffer> enhancementBuffer;
 
         private void Start()
         {
@@ -23,6 +23,7 @@ namespace Mono
 
         public void OnClik(EnhancementData enhancementData)
         {
+            Time.timeScale = 1;
             AddOrSetEnhancementComponent(enhancementData);
         }
 
@@ -33,15 +34,20 @@ namespace Mono
             yield return null;
 
             // 必要なコンポーネントの取得
-            var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
+
+            Entity playerEntity = new();
+            yield return new WaitUntil(() =>
+            {
+                var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<PlayerSingleton>();
-            var playerEntity = entityManager
-                .CreateEntityQuery(entityQueryBuilder)
-                .GetSingletonEntity();
+                return entityManager
+                    .CreateEntityQuery(entityQueryBuilder)
+                    .TryGetSingletonEntity<Entity>(out playerEntity);
+            });
 
             // バッファを追加
             enhancementBuffer = entityManager
-                .AddBuffer<EnhancementComponent>(playerEntity);
+                .AddBuffer<EnhancementBuffer>(playerEntity);
 
             foreach (var enhancementData in enhancementDecide.enhancementDataCollection)
             {
@@ -80,7 +86,7 @@ namespace Mono
                     Debug.Log($"{enhancementData.EnhancementType}が存在しているため強化しました。\n{enhancementBuffer[i].Value}から{enhancementedValue}へ強化");
 
                     // 新しい強化コンポーネントがBuffer内に存在していたら書き換える
-                    enhancementBuffer[i] = new EnhancementComponent
+                    enhancementBuffer[i] = new EnhancementBuffer
                     {
                         EnhancementType = enhancementData.EnhancementType,
                         Value = enhancementedValue
@@ -91,7 +97,7 @@ namespace Mono
             }
 
             // 存在しなければ追加する
-            enhancementBuffer.Add(new EnhancementComponent
+            enhancementBuffer.Add(new EnhancementBuffer
             {
                 EnhancementType = enhancementData.EnhancementType,
                 Value = enhancementData.FirstValue,

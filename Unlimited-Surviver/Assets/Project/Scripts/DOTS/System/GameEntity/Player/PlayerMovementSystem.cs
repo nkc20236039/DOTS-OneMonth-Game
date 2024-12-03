@@ -20,15 +20,25 @@ namespace DOTS
             state.RequireForUpdate<PhysicsVelocity>();
             state.RequireForUpdate<PlayerInputComponent>();
             state.RequireForUpdate<PlayerSingleton>();
+            state.RequireForUpdate<EnhancementBuffer>();
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
+            // 時間停止されていたら処理を実行しない
             if (SystemAPI.Time.DeltaTime == 0) { return; }
+
+            // 速度を取得
+            var speed = EnhancemetTypeCollection
+                .GetEnhancementValue(EnhancementContents.PlayerSpeed, state.EntityManager);
+
+            // 速度が取得できなければ処理を終了
+            if (speed == false) { return; }
 
             state.Dependency = new PlayerMovementJob
             {
-                Player = SystemAPI.GetSingleton<PlayerSingleton>()
+                Player = SystemAPI.GetSingleton<PlayerSingleton>(),
+                Speed = speed.Value,
             }.ScheduleParallel(state.Dependency);
 
             state.Dependency.Complete();
@@ -42,6 +52,7 @@ namespace DOTS
     public partial struct PlayerMovementJob : IJobEntity
     {
         [ReadOnly] public PlayerSingleton Player;
+        [ReadOnly] public float Speed;
 
         private void Execute(
             ref LocalTransform transform,
@@ -61,7 +72,7 @@ namespace DOTS
             // 速度を適用
             velocity.Linear
                 = moveDirection
-                * Player.Speed;
+                * Speed;
 
             // Y座標を0に固定
             transform.Position.y = 0;

@@ -8,8 +8,6 @@ namespace Mono
     public class PlayerAuthoring : MonoBehaviour
     {
         [SerializeField]
-        private float speed;    // プレイヤーの速度
-        [SerializeField]
         private float rotationSpeed; // 回転の速度
         [SerializeField]
         private float avoidPower;   // 回避力
@@ -32,7 +30,6 @@ namespace Mono
                 AddComponent(player, typeof(PlayerInputComponent));
                 AddComponent(player, new PlayerSingleton
                 {
-                    Speed = authoring.speed,
                     RotationSpeed = authoring.rotationSpeed,
                 });
                 // 回避を追加

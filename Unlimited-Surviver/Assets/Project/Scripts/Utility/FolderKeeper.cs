@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿#if UNITY_EDITOR
+using System.IO;
 using UnityEditor;
 
 //起動時に実行
@@ -77,4 +78,4 @@ public class FolderKeeper : AssetPostprocessor
         }
     }
 }
-
+#endif

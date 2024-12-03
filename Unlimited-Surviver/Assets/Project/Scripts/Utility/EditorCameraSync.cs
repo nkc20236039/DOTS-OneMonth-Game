@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -31,3 +29,4 @@ public class EditorCameraSync : MonoBehaviour
         gameCamera.fieldOfView = sceneCamera.fieldOfView;
     }
 }
+#endif

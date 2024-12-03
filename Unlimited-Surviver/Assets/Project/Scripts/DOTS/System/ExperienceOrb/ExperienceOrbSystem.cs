@@ -15,7 +15,7 @@ namespace DOTS
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
-
+            state.RequireForUpdate<PlayerSingleton>();
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)

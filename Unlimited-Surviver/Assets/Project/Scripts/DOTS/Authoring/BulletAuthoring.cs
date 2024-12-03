@@ -17,7 +17,7 @@ namespace DOTS
             public override void Bake(BulletAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.None);
-                AddComponent(entity, new BulletComponent
+                AddComponent(entity, new BulletParameterComponent
                 {
                     Speed = authoring.speed,
                     Lifetime = authoring.lifeTime,

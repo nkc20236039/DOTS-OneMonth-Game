@@ -1,4 +1,4 @@
-using Unity.Entities;
+ï»¿using Unity.Entities;
 using Unity.Mathematics;
 
 namespace DOTS
@@ -7,8 +7,8 @@ namespace DOTS
     {
         public float ShotInterval;
         public Entity Bullet;
-        public float2 Offset;   // ’e‚ğ¢Š«‚·‚éƒIƒtƒZƒbƒg
+        public float2 Offset;   // å¼¾ã‚’å¬å–šã™ã‚‹ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 
-        public float Cooldown;
+        public float NextShot;
     }
 }

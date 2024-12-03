@@ -94,14 +94,10 @@ namespace Mono
                 .enhancementDataCollection
                 .ToList();
 
-            // 時間を元に乱数を初期化
-            uint seed = (uint)(Time.time * 100);    // コンマ秒の部分も利用するために二桁繰り上げ
-            Unity.Mathematics.Random random = new(seed);
-
-            // ランダムに教科内容を選出
+            // ランダムに強化内容を選出
             for (int i = 0; i < chosenData.Length; i++)
             {
-                int pickup = random.NextInt(enhancementDataList.Count);
+                int pickup = UnityEngine.Random.Range(0, enhancementDataList.Count);
 
                 chosenData[i] = enhancementDataList[pickup];
                 enhancementDataList.RemoveAt(pickup);

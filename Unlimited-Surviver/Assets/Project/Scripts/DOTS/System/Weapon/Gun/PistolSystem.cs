@@ -1,3 +1,4 @@
+ï»¿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -5,6 +6,7 @@ using Unity.Transforms;
 
 namespace DOTS
 {
+    [BurstCompile]
     public partial struct PistolSystem : ISystem
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
@@ -14,47 +16,76 @@ namespace DOTS
                 .Build();
 
             state.RequireForUpdate(query);
+            state.RequireForUpdate<EnhancementBuffer>();
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
         {
-            foreach ((var pistol, var weapon, var transform, var pistolEntity) in SystemAPI.Query<
-                RefRW<PistolComponent>,
-                RefRO<WeaponComponent>,
-                RefRO<LocalTransform>>()
-                .WithEntityAccess())
+            // ECBã®æº–å‚™
+            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
+            // ç™ºå°„é–“éš”ã®å–å¾—
+            var shotInterval = EnhancemetTypeCollection
+                .GetEnhancementValue(EnhancementContents.PistolFireRate, state.EntityManager);
+            // å–å¾—ã§ããªã‘ã‚Œã°å‡¦ç†ã‚’çµ‚äº†
+            if (shotInterval == false) { return; }
+
+            state.Dependency = new PistolJob
             {
-                // ƒN[ƒ‹ƒ_ƒEƒ“‚Ì”»’è
-                pistol.ValueRW.Cooldown += SystemAPI.Time.DeltaTime;
-                if (pistol.ValueRO.ShotInterval > pistol.ValueRO.Cooldown) { return; }
+                ShotInterval = shotInterval.Value,
+                ElapsedTime = (float)SystemAPI.Time.ElapsedTime,
+                ParallelEcb = ecb.AsParallelWriter(),
+                ParentGroup = state.GetComponentLookup<Parent>(true)
+            }.ScheduleParallel(state.Dependency);
 
-                // ’e‚ğ¢Š«
-                var bullet = state.EntityManager.Instantiate(pistol.ValueRO.Bullet);
+            state.Dependency.Complete();
+        }
+    }
 
-                // ƒIƒtƒZƒbƒg‚ğ“K—p
-                var offsetDirection
-                    = math.forward(weapon.ValueRO.WorldRotation)
-                    * pistol.ValueRO.Offset.x;
-                var position = weapon.ValueRO.WorldPosition + offsetDirection;
-                position.y += pistol.ValueRO.Offset.y;
+    public partial struct PistolJob : IJobEntity
+    {
+        public float ElapsedTime;
+        public float ShotInterval;
+        public EntityCommandBuffer.ParallelWriter ParallelEcb;
+        [ReadOnly] public ComponentLookup<Parent> ParentGroup;
 
-                // ˆÊ’u‚ğ‘‚«Š·‚¦
-                state.EntityManager.SetComponentData(bullet, new LocalTransform
-                {
-                    Position = position,
-                    Scale = 1,
-                    Rotation = weapon.ValueRO.WorldRotation
-                });
+        private void Execute(
+            [EntityIndexInQuery] int index,
+            Entity entity,
+            ref PistolComponent pistol,
+            in WeaponComponent weapon,
+            in LocalTransform transform)
+        {
+            // ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³ã®åˆ¤å®š
+            if (ElapsedTime < pistol.NextShot) { return; }
 
-                var bulletComponent = SystemAPI.GetComponentRW<BulletComponent>(bullet);
-                // e‚É‚È‚Á‚Ä‚¢‚é(ƒvƒŒƒCƒ„[‘z’è)ƒGƒ“ƒeƒBƒeƒB‚ğæ“¾
-                var parent = SystemAPI.GetComponent<Parent>(pistolEntity);
-                // ’e‚ÌƒI[ƒi[‚ğw’è
-                bulletComponent.ValueRW.Owner = parent.Value;
+            // å¼¾ã‚’å¬å–š
+            var bullet = ParallelEcb.Instantiate(index, pistol.Bullet);
 
-                // ŠÔ‚ğ‰Šú‰»
-                pistol.ValueRW.Cooldown = 0;
-            }
+            // ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’é©ç”¨
+            var offsetDirection
+                = math.forward(weapon.WorldRotation)
+                * pistol.Offset.x;
+            var position = weapon.WorldPosition + offsetDirection;
+            position.y += pistol.Offset.y;
+
+            // ä½ç½®ã‚’æ›¸ãæ›ãˆ
+            ParallelEcb.SetComponent(index, bullet, new LocalTransform
+            {
+                Position = position,
+                Scale = 1,
+                Rotation = weapon.WorldRotation
+            });
+
+            ParallelEcb.AddComponent(index, bullet, new BulletComponent
+            {
+                // è¦ªã«ãªã£ã¦ã„ã‚‹(ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æƒ³å®š)ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚’å–å¾—
+                Owner = ParentGroup[entity].Value
+            });
+
+            // æ¬¡ã®ç™ºå°„æ™‚é–“ã‚’æŒ‡å®š
+            pistol.NextShot = ElapsedTime + ShotInterval;
         }
     }
 }
