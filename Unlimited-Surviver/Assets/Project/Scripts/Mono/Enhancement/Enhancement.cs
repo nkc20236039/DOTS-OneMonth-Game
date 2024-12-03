@@ -12,7 +12,7 @@ namespace Mono
         private EnhancementDecideData enhancementDecide;
 
         private EntityManager entityManager;
-        private PlayerSingleton player;
+        private Entity playerEntity;
         private DynamicBuffer<EnhancementBuffer> enhancementBuffer;
 
         private void Start()
@@ -21,7 +21,7 @@ namespace Mono
             StartCoroutine(Initalize());
         }
 
-        public void OnClik(EnhancementData enhancementData)
+        public void EnhancementUpdate(EnhancementData enhancementData)
         {
             Time.timeScale = 1;
             AddOrSetEnhancementComponent(enhancementData);
@@ -35,7 +35,7 @@ namespace Mono
 
             // 必要なコンポーネントの取得
 
-            Entity playerEntity = new();
+            playerEntity = new();
             yield return new WaitUntil(() =>
             {
                 var entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
@@ -64,6 +64,7 @@ namespace Mono
         /// </summary>
         private void AddOrSetEnhancementComponent(EnhancementData enhancementData, bool isInit = false)
         {
+            enhancementBuffer = entityManager.GetBuffer<EnhancementBuffer>(playerEntity);
             for (int i = 0; i < enhancementBuffer.Length; i++)
             {
                 if (isInit)

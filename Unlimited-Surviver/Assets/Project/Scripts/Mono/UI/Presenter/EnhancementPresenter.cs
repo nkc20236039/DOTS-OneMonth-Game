@@ -9,7 +9,7 @@ namespace Mono
     public class EnhancementPresenter : MonoBehaviour
     {
         [SerializeField]
-        private EnhancementPView view;
+        private EnhancementView view;
         [SerializeField]
         private EnhancementDecider model;
 
