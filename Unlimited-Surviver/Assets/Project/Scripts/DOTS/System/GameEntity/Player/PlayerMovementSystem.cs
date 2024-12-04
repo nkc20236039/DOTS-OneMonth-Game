@@ -60,6 +60,9 @@ namespace DOTS
             ref PhysicsMass mass,
             in PlayerInputComponent playerInput)
         {
+            // 物理の回転を固定
+            mass.InverseInertia = float3.zero;
+
             // 受け取った入力を平面へ変換
             float3 moveDirection = new
             (
@@ -94,8 +97,6 @@ namespace DOTS
                     Player.RotationSpeed
                 );
 
-            // 物理の回転を固定
-            mass.InverseInertia = float3.zero;
         }
     }
 }

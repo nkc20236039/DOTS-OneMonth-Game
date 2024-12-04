@@ -60,5 +60,11 @@ namespace Mono
             // キャンバス表示
             canvas.SetActive(true);
         }
+
+        public void Hide()
+        {
+            // キャンバス非表示
+            canvas.SetActive(false);
+        }
     }
 }
