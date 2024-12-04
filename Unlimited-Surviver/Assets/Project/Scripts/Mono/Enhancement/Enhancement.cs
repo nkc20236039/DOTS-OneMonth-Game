@@ -1,5 +1,4 @@
 ﻿using DOTS;
-using System;
 using System.Collections;
 using Unity.Collections;
 using Unity.Entities;

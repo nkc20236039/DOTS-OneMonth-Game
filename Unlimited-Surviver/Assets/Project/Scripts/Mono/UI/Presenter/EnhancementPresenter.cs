@@ -1,8 +1,4 @@
-﻿using DOTS;
-using System.Collections;
-using Unity.Collections;
-using Unity.Entities;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Mono
 {
