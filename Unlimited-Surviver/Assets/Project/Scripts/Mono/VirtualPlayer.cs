@@ -1,4 +1,4 @@
-using DOTS;
+﻿using DOTS;
 using Unity.Entities;
 using UnityEngine;
 
@@ -23,6 +23,7 @@ namespace DOTStoMono
         private void Update()
         {
             transform.position = virtualPlayerPosition.VirtualPlayerTransform.position;
+            transform.rotation = virtualPlayerPosition.VirtualPlayerTransform.rotation;
         }
     }
 }

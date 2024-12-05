@@ -44,6 +44,15 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""4d397035-efe7-4648-b0e3-c476c5183e91"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -178,6 +187,28 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""action"": ""Avoid"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""33d279b6-931f-451b-81bc-f5ca78018875"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": ""ScaleVector2"",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e8209b2c-6147-4f5c-92a5-53ef94b70618"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": ""ScaleVector2"",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -188,6 +219,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_IngamePlayer = asset.FindActionMap("IngamePlayer", throwIfNotFound: true);
         m_IngamePlayer_Move = m_IngamePlayer.FindAction("Move", throwIfNotFound: true);
         m_IngamePlayer_Avoid = m_IngamePlayer.FindAction("Avoid", throwIfNotFound: true);
+        m_IngamePlayer_Look = m_IngamePlayer.FindAction("Look", throwIfNotFound: true);
     }
 
     ~@PlayerInputAction()
@@ -256,12 +288,14 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private List<IIngamePlayerActions> m_IngamePlayerActionsCallbackInterfaces = new List<IIngamePlayerActions>();
     private readonly InputAction m_IngamePlayer_Move;
     private readonly InputAction m_IngamePlayer_Avoid;
+    private readonly InputAction m_IngamePlayer_Look;
     public struct IngamePlayerActions
     {
         private @PlayerInputAction m_Wrapper;
         public IngamePlayerActions(@PlayerInputAction wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_IngamePlayer_Move;
         public InputAction @Avoid => m_Wrapper.m_IngamePlayer_Avoid;
+        public InputAction @Look => m_Wrapper.m_IngamePlayer_Look;
         public InputActionMap Get() { return m_Wrapper.m_IngamePlayer; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -277,6 +311,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Avoid.started += instance.OnAvoid;
             @Avoid.performed += instance.OnAvoid;
             @Avoid.canceled += instance.OnAvoid;
+            @Look.started += instance.OnLook;
+            @Look.performed += instance.OnLook;
+            @Look.canceled += instance.OnLook;
         }
 
         private void UnregisterCallbacks(IIngamePlayerActions instance)
@@ -287,6 +324,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Avoid.started -= instance.OnAvoid;
             @Avoid.performed -= instance.OnAvoid;
             @Avoid.canceled -= instance.OnAvoid;
+            @Look.started -= instance.OnLook;
+            @Look.performed -= instance.OnLook;
+            @Look.canceled -= instance.OnLook;
         }
 
         public void RemoveCallbacks(IIngamePlayerActions instance)
@@ -308,5 +348,6 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnAvoid(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
     }
 }

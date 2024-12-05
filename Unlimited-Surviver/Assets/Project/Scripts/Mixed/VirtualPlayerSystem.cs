@@ -1,4 +1,4 @@
-using DOTS;
+ï»¿using DOTS;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Transforms;
@@ -19,17 +19,18 @@ namespace DOTStoMono
         {
             if (virtualPlayer == null)
             {
-                // MonoBehaviour‘¤‚ÌƒvƒŒƒCƒ„[‚ğæ“¾
+                // MonoBehaviourå´ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’å–å¾—
                 virtualPlayer = SystemAPI.ManagedAPI
                     .GetSingleton<VirtualPlayerManagedSingleton>();
             }
 
-            // DOTS‘¤‚ÌƒvƒŒƒCƒ„[‚ğæ“¾
+            // DOTSå´ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’å–å¾—
             var player = SystemAPI.GetSingletonEntity<PlayerSingleton>();
             var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
 
-            // ˆÊ’u‚ğ“¯Šú
+            // ä½ç½®ã‚’åŒæœŸ
             virtualPlayer.VirtualPlayerTransform.position = playerTransform.Position;
+            virtualPlayer.VirtualPlayerTransform.rotation = playerTransform.Rotation;
         }
     }
 }

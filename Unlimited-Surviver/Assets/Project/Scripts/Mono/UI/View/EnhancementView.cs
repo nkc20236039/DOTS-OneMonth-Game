@@ -47,6 +47,10 @@ namespace Mono
 
         public void Show(EnhancementData[] enhancementData)
         {
+            // カーソル表示
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
             // それぞれに情報を入れる
             for (int i = 0; i < selectButtons.Length; i++)
             {
@@ -62,6 +66,10 @@ namespace Mono
 
         public void Hide()
         {
+            // カーソル固定
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
             // キャンバス非表示
             canvas.SetActive(false);
         }
