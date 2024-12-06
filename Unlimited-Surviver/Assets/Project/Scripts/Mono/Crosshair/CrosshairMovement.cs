@@ -40,7 +40,7 @@ public class CrosshairMovement : MonoBehaviour
         position += delta;
 
         // 画面内に制限
-        Vector2 offset = crosshairTransform.sizeDelta / 2;
+        Vector2 offset = crosshairTransform.sizeDelta * 0.5f;
 
         position.x = Mathf.Max(offset.x, position.x);
         position.x = Mathf.Min(screenMaxSize.x - offset.x, position.x);

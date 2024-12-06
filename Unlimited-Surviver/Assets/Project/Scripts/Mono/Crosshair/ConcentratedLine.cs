@@ -40,10 +40,12 @@ namespace Mono
 
             // 長さを決定
             var rectTransform = GetComponent<RectTransform>();
+            var widthPow = Screen.width * Screen.width;
+            var heightPow = Screen.height * Screen.height;
             rectTransform.SetSizeWithCurrentAnchors
             (
                 RectTransform.Axis.Horizontal,
-                Screen.width + Screen.height
+                Mathf.Sqrt(widthPow + heightPow)
             );
         }
 
