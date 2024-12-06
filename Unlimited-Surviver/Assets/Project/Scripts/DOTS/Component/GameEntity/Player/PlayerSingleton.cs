@@ -5,6 +5,7 @@ namespace DOTS
 {
     public struct PlayerSingleton : IComponentData
     {
+        public float PropulsionPower;
         public float RotationSpeed;
     }
 }

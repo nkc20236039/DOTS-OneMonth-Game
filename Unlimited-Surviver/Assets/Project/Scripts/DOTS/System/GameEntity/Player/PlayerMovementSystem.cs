@@ -34,10 +34,15 @@ namespace DOTS
             // 速度が取得できなければ処理を終了
             if (speed == false) { return; }
 
+            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
             state.Dependency = new PlayerMovementJob
             {
                 Player = SystemAPI.GetSingleton<PlayerSingleton>(),
                 Speed = speed.Value,
+                ParallelEcb = ecb.AsParallelWriter(),
+                FighterTiltGroup = SystemAPI.GetComponentLookup<FighterTiltComponent>(true)
             }.ScheduleParallel(state.Dependency);
 
             state.Dependency.Complete();
@@ -52,40 +57,63 @@ namespace DOTS
     {
         [ReadOnly] public PlayerSingleton Player;
         [ReadOnly] public float Speed;
+        [ReadOnly] public ComponentLookup<FighterTiltComponent> FighterTiltGroup;
+        public EntityCommandBuffer.ParallelWriter ParallelEcb;
 
+        [BurstCompile]
         private void Execute(
+            [EntityIndexInQuery] int index,
+            Entity player,
             ref LocalTransform transform,
             ref PhysicsVelocity velocity,
             ref PhysicsMass mass,
-            in PlayerInputComponent playerInput)
+            in PlayerInputComponent playerInput,
+            in DynamicBuffer<Child> children)
         {
             // 物理の回転を固定
             mass.InverseInertia = float3.zero;
+            // オブジェクト基準の方向を取得
+            float3 forward = math.forward(transform.Rotation);
+            float3 right = math.mul(transform.Rotation, new float3(1, 0, 0));
 
-            // 受け取った入力を平面へ変換
-            float3 moveDirection = new
-            (
-                playerInput.MoveDirection.x,
-                0,
-                playerInput.MoveDirection.y
-            );
+            // 移動をしていなければ処理をしない
+            if (math.distancesq(float2.zero, playerInput.MoveDirection) == 0)
+            {
+                velocity.Linear = forward * Player.PropulsionPower;
+
+                foreach (var child in children)
+                {
+                    if (FighterTiltGroup.HasComponent(child.Value))
+                    {
+                        FighterTiltComponent fighterTilt = FighterTiltGroup[child.Value];
+                        fighterTilt.TargetTurnDirection = float3.zero;
+                        ParallelEcb.SetComponent(index, child.Value, fighterTilt);
+                    }
+                }
+
+                return;
+            }
+            // 移動方向を計算
+            var forwardMoveDirection = forward * playerInput.MoveDirection.y;
+            var rightMoveDirection = right * playerInput.MoveDirection.x;
+            var moveDirection = forwardMoveDirection + rightMoveDirection;
+
             moveDirection = math.normalizesafe(moveDirection);
 
-            // 速度を適用
-            velocity.Linear
-                = moveDirection
-                * Speed;
+            // 移動量
+            var movePower = moveDirection * Speed;
+            // 前後入力方向に推進力をかける
+            movePower += forward * Player.PropulsionPower;
 
-            // Y座標を0に固定
-            transform.Position.y = 0;
+            // 速度を適用
+            velocity.Linear = movePower;
 
             // 移動をしていなければこれ以降の処理を実行しない
-            // (入力を監視していてエンティティ全て処理が行われないことが確定しているためループを抜けてよい)
-            if (math.distancesq(float3.zero, moveDirection) == 0) { return; }
+            if (math.distancesq(float3.zero, rightMoveDirection) == 0) { return; }
 
             /*回転の計算*/
             quaternion currentRotation = transform.Rotation;
-            quaternion lookRotation = quaternion.LookRotationSafe(moveDirection, math.up());
+            quaternion lookRotation = quaternion.LookRotationSafe(rightMoveDirection, math.up());
 
             // スムーズに回転させる
             transform.Rotation
@@ -96,6 +124,16 @@ namespace DOTS
                     Player.RotationSpeed
                 );
 
+            // 機体を斜めにするために値を渡す
+            foreach (var child in children)
+            {
+                if (FighterTiltGroup.HasComponent(child.Value))
+                {
+                    FighterTiltComponent fighterTilt = FighterTiltGroup[child.Value];
+                    fighterTilt.TargetTurnDirection = new float3(playerInput.MoveDirection.x, 0, 0);
+                    ParallelEcb.SetComponent(index, child.Value, fighterTilt);
+                }
+            }
         }
     }
 }
