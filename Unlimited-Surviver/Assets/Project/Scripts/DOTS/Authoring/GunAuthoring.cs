@@ -1,4 +1,4 @@
-using Unity.Entities;
+﻿using Unity.Entities;
 using UnityEngine;
 
 namespace DOTS
@@ -21,10 +21,7 @@ namespace DOTS
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 var bullet = GetEntity(authoring.bulletPrefab, TransformUsageFlags.Dynamic);
 
-                AddComponent(entity, new WeaponComponent
-                {
-                    Offset = authoring.gunOffset,
-                });
+                
                 AddComponent(entity, new PistolComponent
                 {
                     Bullet = bullet,

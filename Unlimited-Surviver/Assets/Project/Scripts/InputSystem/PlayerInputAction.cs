@@ -53,6 +53,15 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""CrosshairReset"",
+                    ""type"": ""Button"",
+                    ""id"": ""5c775e4b-23ae-4a6c-bd48-bfc3d53ee9a5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -209,6 +218,28 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""81088bd8-5858-4039-a09c-9364330f73a3"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CrosshairReset"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""73c554bf-a168-40de-90df-f9c7412aa404"",
+                    ""path"": ""<Gamepad>/rightStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CrosshairReset"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -220,6 +251,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_IngamePlayer_Move = m_IngamePlayer.FindAction("Move", throwIfNotFound: true);
         m_IngamePlayer_Avoid = m_IngamePlayer.FindAction("Avoid", throwIfNotFound: true);
         m_IngamePlayer_Look = m_IngamePlayer.FindAction("Look", throwIfNotFound: true);
+        m_IngamePlayer_CrosshairReset = m_IngamePlayer.FindAction("CrosshairReset", throwIfNotFound: true);
     }
 
     ~@PlayerInputAction()
@@ -289,6 +321,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_IngamePlayer_Move;
     private readonly InputAction m_IngamePlayer_Avoid;
     private readonly InputAction m_IngamePlayer_Look;
+    private readonly InputAction m_IngamePlayer_CrosshairReset;
     public struct IngamePlayerActions
     {
         private @PlayerInputAction m_Wrapper;
@@ -296,6 +329,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_IngamePlayer_Move;
         public InputAction @Avoid => m_Wrapper.m_IngamePlayer_Avoid;
         public InputAction @Look => m_Wrapper.m_IngamePlayer_Look;
+        public InputAction @CrosshairReset => m_Wrapper.m_IngamePlayer_CrosshairReset;
         public InputActionMap Get() { return m_Wrapper.m_IngamePlayer; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -314,6 +348,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @CrosshairReset.started += instance.OnCrosshairReset;
+            @CrosshairReset.performed += instance.OnCrosshairReset;
+            @CrosshairReset.canceled += instance.OnCrosshairReset;
         }
 
         private void UnregisterCallbacks(IIngamePlayerActions instance)
@@ -327,6 +364,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @CrosshairReset.started -= instance.OnCrosshairReset;
+            @CrosshairReset.performed -= instance.OnCrosshairReset;
+            @CrosshairReset.canceled -= instance.OnCrosshairReset;
         }
 
         public void RemoveCallbacks(IIngamePlayerActions instance)
@@ -349,5 +389,6 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnAvoid(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnCrosshairReset(InputAction.CallbackContext context);
     }
 }

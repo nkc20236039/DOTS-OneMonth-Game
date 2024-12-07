@@ -8,19 +8,26 @@ public class CrosshairMovement : MonoBehaviour
 {
     [SerializeField]
     private RectTransform crosshairTransform;
+    [SerializeField]
+    private Vector2 initalPosition;
+    [SerializeField]
+    private Vector2 limitRangeMove;
 
     private PlayerInputAction inputAction;
+    private RectTransform canvasTransform;
     private Vector2 screenMaxSize;
+    private Vector2 screenCenter;
 
     void Start()
     {
-        screenMaxSize = new Vector2(Screen.width, Screen.height);
+        SetMovableSize();
 
         // InputSystemの準備
         inputAction = new();
 
         inputAction.IngamePlayer.Look.performed += Look;
         inputAction.IngamePlayer.Look.canceled += Look;
+        inputAction.IngamePlayer.CrosshairReset.started += CrosshairPositionInitalize;
 
         inputAction.Enable();
 
@@ -40,13 +47,54 @@ public class CrosshairMovement : MonoBehaviour
         position += delta;
 
         // 画面内に制限
-        Vector2 offset = crosshairTransform.sizeDelta * 0.5f;
+        Vector2 crosshairSize = crosshairTransform.sizeDelta * 0.5f;
+        Vector2 screenHalfSize = screenMaxSize * 0.5f;
 
-        position.x = Mathf.Max(offset.x, position.x);
-        position.x = Mathf.Min(screenMaxSize.x - offset.x, position.x);
-        position.y = Mathf.Max(offset.y, position.y);
-        position.y = Mathf.Min(screenMaxSize.y - offset.y, position.y);
+        // 制限をかける
+        position.x = Mathf.Max(screenCenter.x - screenHalfSize.x + crosshairSize.x, position.x);
+        position.x = Mathf.Min(screenCenter.x + screenHalfSize.x - crosshairSize.x, position.x);
+        position.y = Mathf.Max(screenCenter.y - screenHalfSize.y + crosshairSize.y, position.y);
+        position.y = Mathf.Min(screenCenter.y + screenHalfSize.y - crosshairSize.y, position.y);
 
         crosshairTransform.position = position;
     }
+
+    private void CrosshairPositionInitalize(InputAction.CallbackContext context)
+    {
+        // クロスヘアを初期位置へ戻す
+        Vector2 screenPosition = canvasTransform.sizeDelta * initalPosition;
+        crosshairTransform.position = screenPosition;
+    }
+
+    private void SetMovableSize()
+    {
+        if (canvasTransform == null)
+        {
+            canvasTransform = GetComponent<RectTransform>();
+        }
+
+        screenMaxSize = canvasTransform.sizeDelta * limitRangeMove;
+        screenCenter = canvasTransform.sizeDelta * 0.5f;
+    }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // 範囲を0～1に制限
+        limitRangeMove.x = Mathf.Clamp01(limitRangeMove.x);
+        limitRangeMove.y = Mathf.Clamp01(limitRangeMove.y);
+        initalPosition.x = Mathf.Clamp01(initalPosition.x);
+        initalPosition.y = Mathf.Clamp01(initalPosition.y);
+    }
+
+    private void OnDrawGizmos()
+    {
+        SetMovableSize();
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(screenCenter, screenMaxSize);
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(canvasTransform.sizeDelta * initalPosition, 10);
+    }
+#endif
 }
