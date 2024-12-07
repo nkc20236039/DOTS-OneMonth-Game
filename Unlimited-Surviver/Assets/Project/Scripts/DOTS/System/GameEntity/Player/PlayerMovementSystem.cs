@@ -86,7 +86,7 @@ namespace DOTS
                     if (FighterTiltGroup.HasComponent(child.Value))
                     {
                         FighterTiltComponent fighterTilt = FighterTiltGroup[child.Value];
-                        fighterTilt.TargetTurnDirection = float3.zero;
+                        fighterTilt.TiltPower = 0;
                         ParallelEcb.SetComponent(index, child.Value, fighterTilt);
                     }
                 }
@@ -129,8 +129,9 @@ namespace DOTS
             {
                 if (FighterTiltGroup.HasComponent(child.Value))
                 {
+                    // 子オブジェクトのコンポーネントに値をセット
                     FighterTiltComponent fighterTilt = FighterTiltGroup[child.Value];
-                    fighterTilt.TargetTurnDirection = new float3(playerInput.MoveDirection.x, 0, 0);
+                    fighterTilt.TiltPower = playerInput.MoveDirection.x;
                     ParallelEcb.SetComponent(index, child.Value, fighterTilt);
                 }
             }

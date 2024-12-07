@@ -21,32 +21,17 @@ namespace DOTS
                 RefRW<FighterParameterComponent>,
                 RefRW<FighterTiltComponent>>())
             {
-                if (math.distancesq(fighterTilt.ValueRO.TargetTurnDirection, float3.zero) == 0) { continue; }
-                
-                continue;
-                // 必要な方向を取得
-                var currentForward = math.forward(transform.ValueRO.Rotation);
-                var currentRight = math.mul(transform.ValueRO.Rotation, new float3(1, 0, 0));
-                var targetDirection = math.normalize(fighterTilt.ValueRO.TargetTurnDirection);
+                // 傾ける力を-1から1までに制限
+                var tiltPower = math.clamp(fighterTilt.ValueRO.TiltPower, -1, 1);
 
-                var angleBetween = SignedAngle(currentForward, targetDirection, math.forward());
-
-                // 機体を傾ける角度を計算
-                var maxTiltAngle = fighterParameter.ValueRO.MaxTiltAngle;
-                float tiltAngle = math.clamp(-angleBetween, -maxTiltAngle, maxTiltAngle);
-
-                // 傾き用の回転を計算
-                quaternion tiltRotation = quaternion.AxisAngle(currentForward, tiltAngle);
-
-                // 新しい回転を計算
-                var lookRotation = quaternion.LookRotationSafe(targetDirection, math.up());
-                quaternion targetRotation = math.mul(lookRotation, tiltRotation);
+                // 最大角度までの強度に応じて角度を取得
+                var angle = fighterParameter.ValueRO.MaxTiltAngle * tiltPower;
 
                 // スムーズに回転させる
                 transform.ValueRW.Rotation = math.slerp
                 (
                     transform.ValueRO.Rotation,
-                    targetRotation,
+                    quaternion.Euler(0, 0, -angle),
                     fighterParameter.ValueRO.TiltSpeed * SystemAPI.Time.DeltaTime
                 );
             }

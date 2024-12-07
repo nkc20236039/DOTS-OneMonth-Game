@@ -5,6 +5,6 @@ namespace DOTS
 {
     public struct FighterTiltComponent : IComponentData
     {
-        public float3 TargetTurnDirection;
+        public float TiltPower;
     }
 }
