@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Canvas))]
@@ -12,6 +10,12 @@ public class CrosshairMovement : MonoBehaviour
     private Vector2 initalPosition;
     [SerializeField]
     private Vector2 limitRangeMove;
+    [SerializeField]
+    private Transform player;
+    [SerializeField]
+    private Camera viewCamera;
+    [SerializeField]
+    private GameObject demoObject;
 
     private PlayerInputAction inputAction;
     private RectTransform canvasTransform;
@@ -44,6 +48,7 @@ public class CrosshairMovement : MonoBehaviour
         // 現在の位置とマウス移動量を取得
         Vector3 position = crosshairTransform.position;
         Vector3 delta = context.ReadValue<Vector2>();
+        delta.y = 0;
         position += delta;
 
         // 画面内に制限
@@ -57,6 +62,32 @@ public class CrosshairMovement : MonoBehaviour
         position.y = Mathf.Min(screenCenter.y + screenHalfSize.y - crosshairSize.y, position.y);
 
         crosshairTransform.position = position;
+
+        var playerScreenPosition = viewCamera.WorldToScreenPoint(player.position);
+        var angle = GetAngleToTarget(playerScreenPosition, position, canvasTransform.sizeDelta * initalPosition);
+        demoObject.transform.rotation = Quaternion.Euler(0, angle / 1.5f, 0);
+        Debug.Log(angle);
+    }
+
+    public float GetAngleToTarget(Vector2 playerPosition, Vector2 targetPosition, Vector2 referencePoint)
+    {
+        // ターゲットへのベクトルを計算
+        Vector2 directionToTarget = targetPosition - playerPosition;
+
+        // 基準点からプレイヤーへのベクトルを計算
+        Vector2 referenceToPlayer = playerPosition - referencePoint;
+
+        // Mathf.Atan2を使用して角度を計算（ラジアン）
+        float angle = Mathf.Atan2(referenceToPlayer.y, referenceToPlayer.x)
+                      - Mathf.Atan2(directionToTarget.y, directionToTarget.x);
+
+        // ラジアンを度に変換
+        float angleDegrees = angle * Mathf.Rad2Deg;
+
+        // 角度を0から360の範囲に正規化（時計回りが正）
+        angleDegrees = Mathf.Repeat(angleDegrees, 360);
+
+        return angleDegrees - 180;
     }
 
     private void CrosshairPositionInitalize(InputAction.CallbackContext context)

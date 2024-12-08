@@ -12,7 +12,7 @@ namespace DOTS
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
             var query = SystemAPI.QueryBuilder()
-                .WithAll<PistolComponent, LocalTransform, WeaponComponent>()
+                .WithAll<PistolComponent, LocalTransform>()
                 .Build();
 
             state.RequireForUpdate(query);
@@ -36,7 +36,6 @@ namespace DOTS
                 ShotInterval = shotInterval.Value,
                 ElapsedTime = (float)SystemAPI.Time.ElapsedTime,
                 ParallelEcb = ecb.AsParallelWriter(),
-                ParentGroup = state.GetComponentLookup<Parent>(true)
             }.ScheduleParallel(state.Dependency);
 
             state.Dependency.Complete();
@@ -48,13 +47,11 @@ namespace DOTS
         public float ElapsedTime;
         public float ShotInterval;
         public EntityCommandBuffer.ParallelWriter ParallelEcb;
-        [ReadOnly] public ComponentLookup<Parent> ParentGroup;
 
         private void Execute(
             [EntityIndexInQuery] int index,
             Entity entity,
             ref PistolComponent pistol,
-            in WeaponComponent weapon,
             in LocalTransform transform)
         {
             // クールダウンの判定
@@ -65,23 +62,23 @@ namespace DOTS
 
             // オフセットを適用
             var offsetDirection
-                = math.forward(weapon.WorldRotation)
+                = math.forward(transform.Rotation)
                 * pistol.Offset.x;
-            var position = weapon.WorldPosition + offsetDirection;
+            var position = transform.Position + offsetDirection;
             position.y += pistol.Offset.y;
-
+            
             // 位置を書き換え
             ParallelEcb.SetComponent(index, bullet, new LocalTransform
             {
                 Position = position,
                 Scale = 1,
-                Rotation = weapon.WorldRotation
+                Rotation = transform.Rotation
             });
 
             ParallelEcb.AddComponent(index, bullet, new BulletComponent
             {
                 // 親になっている(プレイヤー想定)エンティティを取得
-                Owner = ParentGroup[entity].Value
+                Owner = entity
             });
 
             // 次の発射時間を指定
