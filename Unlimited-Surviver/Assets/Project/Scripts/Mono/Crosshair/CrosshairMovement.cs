@@ -66,7 +66,7 @@ public class CrosshairMovement : MonoBehaviour
         var playerScreenPosition = viewCamera.WorldToScreenPoint(player.position);
         var angle = GetAngleToTarget(playerScreenPosition, position, canvasTransform.sizeDelta * initalPosition);
         demoObject.transform.rotation = Quaternion.Euler(0, angle / 1.5f, 0);
-        Debug.Log(angle);
+        // Debug.Log(angle);
     }
 
     public float GetAngleToTarget(Vector2 playerPosition, Vector2 targetPosition, Vector2 referencePoint)

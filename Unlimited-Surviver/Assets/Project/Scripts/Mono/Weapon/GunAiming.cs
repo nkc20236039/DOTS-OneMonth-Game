@@ -1,43 +1,23 @@
-using DOTStoMono;
+﻿using DOTStoMono;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Mono
 {
-    public class GunAiming : MonoBehaviour
+    public class GunAiming
     {
-        [SerializeField]
-        private Camera viewCamera;
-        [SerializeField]
-        private LayerMask groundLayer;
+        private EntityManager entityManager;
 
-        private TargetPointManagedSingleton targetPoint;
-
-        private void Start()
+        private GunAiming()
         {
-            targetPoint = new TargetPointManagedSingleton();
-
-            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-            entityManager.CreateSingleton(targetPoint);
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         }
 
-        private void Update()
+        public void Set()
         {
-            var pointer = Pointer.current;
-            if (pointer == null)
-            {
-                return;
-            }
-            var ray = viewCamera.ScreenPointToRay(pointer.position.ReadValue());
-            RaycastHit hitInfo;
-            bool isRaycastHit = Physics.Raycast(ray, out hitInfo, float.MaxValue, groundLayer);
-
-            if (isRaycastHit)
-            {
-                targetPoint.Position = hitInfo.point;
-            }
+            
         }
     }
 }

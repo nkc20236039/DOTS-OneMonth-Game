@@ -1,4 +1,4 @@
-using DOTS;
+ï»¿using DOTS;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -10,23 +10,24 @@ namespace DOTStoMono
     [UpdateInGroup(typeof(ActionUpdateGroup))]
     public partial class GunTargetSystem : SystemBase
     {
-        private TargetPointManagedSingleton targetPoint;
+        private TargetPointComponent targetPoint;
 
         protected override void OnCreate()
         {
-            RequireForUpdate<TargetPointManagedSingleton>();
+            Enabled = false;
+            RequireForUpdate<TargetPointComponent>();
             RequireForUpdate<WeaponComponent>();
             RequireForUpdate<PlayerSingleton>();
         }
 
         protected override void OnUpdate()
         {
-            if (targetPoint == null)
+            /*if (targetPoint == null)
             {
-                // ƒ^[ƒQƒbƒgÀ•W‚ğŠÇ—‚·‚éƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾
+                // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆåº§æ¨™ã‚’ç®¡ç†ã™ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—
                 targetPoint = SystemAPI.ManagedAPI
-                    .GetSingleton<TargetPointManagedSingleton>();
-            }
+                    .GetSingleton<TargetPointComponent>();
+            }*/
 
             var player = SystemAPI.GetSingletonEntity<PlayerSingleton>();
             var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
@@ -34,8 +35,8 @@ namespace DOTStoMono
             foreach (var gun in SystemAPI.Query<RefRW<WeaponComponent>>())
             {
                 float3 direction = targetPoint.Position - playerTransform.Position;
-                
-                // Œ‹‰Ê‚ğe‚Ìƒ^[ƒQƒbƒg‚Éİ’è
+
+                // çµæœã‚’éŠƒã®ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«è¨­å®š
                 gun.ValueRW.TargetDirection = math.normalize(direction);
             }
         }

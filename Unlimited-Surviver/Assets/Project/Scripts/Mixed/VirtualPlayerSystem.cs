@@ -1,6 +1,6 @@
 ﻿using DOTS;
-using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace DOTStoMono
@@ -30,6 +30,7 @@ namespace DOTStoMono
 
             // 位置を同期
             virtualPlayer.VirtualPlayerTransform.position = playerTransform.Position;
+            // 回転を同期
             virtualPlayer.VirtualPlayerTransform.rotation = playerTransform.Rotation;
         }
     }

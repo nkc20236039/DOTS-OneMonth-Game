@@ -108,6 +108,18 @@ namespace DOTS
             // 速度を適用
             velocity.Linear = movePower;
 
+            // 機体を斜めにするために値を渡す
+            foreach (var child in children)
+            {
+                if (FighterTiltGroup.HasComponent(child.Value))
+                {
+                    // 子オブジェクトのコンポーネントに値をセット
+                    FighterTiltComponent fighterTilt = FighterTiltGroup[child.Value];
+                    fighterTilt.TiltPower = playerInput.MoveDirection.x;
+                    ParallelEcb.SetComponent(index, child.Value, fighterTilt);
+                }
+            }
+
             // 移動をしていなければこれ以降の処理を実行しない
             if (math.distancesq(float3.zero, rightMoveDirection) == 0) { return; }
 
@@ -124,17 +136,6 @@ namespace DOTS
                     Player.RotationSpeed
                 );
 
-            // 機体を斜めにするために値を渡す
-            foreach (var child in children)
-            {
-                if (FighterTiltGroup.HasComponent(child.Value))
-                {
-                    // 子オブジェクトのコンポーネントに値をセット
-                    FighterTiltComponent fighterTilt = FighterTiltGroup[child.Value];
-                    fighterTilt.TiltPower = playerInput.MoveDirection.x;
-                    ParallelEcb.SetComponent(index, child.Value, fighterTilt);
-                }
-            }
         }
     }
 }
