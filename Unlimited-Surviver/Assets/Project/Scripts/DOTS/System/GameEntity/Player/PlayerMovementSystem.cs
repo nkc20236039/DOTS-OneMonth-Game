@@ -16,10 +16,14 @@ namespace DOTS
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
-            state.RequireForUpdate<PhysicsVelocity>();
-            state.RequireForUpdate<PlayerInputComponent>();
-            state.RequireForUpdate<PlayerSingleton>();
-            state.RequireForUpdate<EnhancementBuffer>();
+            var queryBuilder = SystemAPI.QueryBuilder()
+                .WithAll<
+                    PhysicsVelocity,
+                    PlayerInputComponent,
+                    PlayerSingleton,
+                    EnhancementBuffer>().Build();
+
+            state.RequireForUpdate(queryBuilder);
         }
 
         void ISystem.OnUpdate(ref Unity.Entities.SystemState state)
@@ -135,7 +139,6 @@ namespace DOTS
                     lookRotation,
                     Player.RotationSpeed
                 );
-
         }
     }
 }

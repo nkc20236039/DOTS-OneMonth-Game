@@ -1072,8 +1072,8 @@ MonoBehaviour:
   bulletPrefab: {fileID: 5990645879819930574, guid: 1fab642c7389280429afbbd7a0a5b776,
     type: 3}
   shotInterval: 0.1
-  gunOffset: {x: 2, y: 1}
-  muzzleOffset: {x: 1, y: 1.1}
+  muzzleOffset: {x: 2.27, y: -0.16}
+  angle: 0.65
 --- !u!1001 &873675629
 PrefabInstance:
   m_ObjectHideFlags: 0

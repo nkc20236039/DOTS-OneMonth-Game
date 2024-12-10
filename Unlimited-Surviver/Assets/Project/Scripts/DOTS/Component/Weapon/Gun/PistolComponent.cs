@@ -8,6 +8,7 @@ namespace DOTS
         public float ShotInterval;
         public Entity Bullet;
         public float2 Offset;   // 弾を召喚するオフセット
+        public float MaxAngle;
 
         public float NextShot;
     }

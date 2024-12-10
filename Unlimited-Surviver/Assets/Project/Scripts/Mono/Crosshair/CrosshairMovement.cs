@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Mono;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Canvas))]
@@ -21,17 +22,24 @@ public class CrosshairMovement : MonoBehaviour
     private RectTransform canvasTransform;
     private Vector2 screenMaxSize;
     private Vector2 screenCenter;
+    private CrosshairTargetConverter crosshairConverter;
 
     void Start()
     {
         SetMovableSize();
-
+        CrosshairPositionInitalize();
+        crosshairConverter = new CrosshairTargetConverter
+        (
+            player.transform.position,
+            crosshairTransform.position,
+            viewCamera.transform.forward
+        );
         // InputSystemの準備
         inputAction = new();
 
         inputAction.IngamePlayer.Look.performed += Look;
         inputAction.IngamePlayer.Look.canceled += Look;
-        inputAction.IngamePlayer.CrosshairReset.started += CrosshairPositionInitalize;
+        inputAction.IngamePlayer.CrosshairReset.started += OnCrosshairInitalize;
 
         inputAction.Enable();
 
@@ -65,8 +73,8 @@ public class CrosshairMovement : MonoBehaviour
 
         var playerScreenPosition = viewCamera.WorldToScreenPoint(player.position);
         var angle = GetAngleToTarget(playerScreenPosition, position, canvasTransform.sizeDelta * initalPosition);
-        demoObject.transform.rotation = Quaternion.Euler(0, angle / 1.5f, 0);
-        // Debug.Log(angle);
+
+        demoObject.transform.rotation = Quaternion.Euler(0, crosshairConverter.UIToWorldAngle(position), 0);
     }
 
     public float GetAngleToTarget(Vector2 playerPosition, Vector2 targetPosition, Vector2 referencePoint)
@@ -90,7 +98,12 @@ public class CrosshairMovement : MonoBehaviour
         return angleDegrees - 180;
     }
 
-    private void CrosshairPositionInitalize(InputAction.CallbackContext context)
+    private void OnCrosshairInitalize(InputAction.CallbackContext context)
+    {
+        CrosshairPositionInitalize();
+    }
+
+    private void CrosshairPositionInitalize()
     {
         // クロスヘアを初期位置へ戻す
         Vector2 screenPosition = canvasTransform.sizeDelta * initalPosition;

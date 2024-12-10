@@ -1,4 +1,5 @@
-﻿using Unity.Burst;
+﻿using DOTStoMono;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -51,8 +52,9 @@ namespace DOTS
         private void Execute(
             [EntityIndexInQuery] int index,
             Entity entity,
-            ref PistolComponent pistol,
-            in LocalTransform transform)
+            in LocalTransform transform,
+            in TargetPointComponent targetPoint,
+            ref PistolComponent pistol)
         {
             // クールダウンの判定
             if (ElapsedTime < pistol.NextShot) { return; }
@@ -66,13 +68,13 @@ namespace DOTS
                 * pistol.Offset.x;
             var position = transform.Position + offsetDirection;
             position.y += pistol.Offset.y;
-            
+
             // 位置を書き換え
             ParallelEcb.SetComponent(index, bullet, new LocalTransform
             {
                 Position = position,
                 Scale = 1,
-                Rotation = transform.Rotation
+                Rotation = math.mul(transform.Rotation, quaternion.Euler(0, targetPoint.TargetAngle, 0))
             });
 
             ParallelEcb.AddComponent(index, bullet, new BulletComponent
