@@ -28,12 +28,7 @@ public class CrosshairMovement : MonoBehaviour
     {
         SetMovableSize();
         CrosshairPositionInitalize();
-        crosshairConverter = new CrosshairTargetConverter
-        (
-            player.transform.position,
-            crosshairTransform.position,
-            viewCamera.transform.forward
-        );
+        crosshairConverter = new CrosshairTargetConverter();
         // InputSystemの準備
         inputAction = new();
 
@@ -71,10 +66,16 @@ public class CrosshairMovement : MonoBehaviour
 
         crosshairTransform.position = position;
 
-        var playerScreenPosition = viewCamera.WorldToScreenPoint(player.position);
-        var angle = GetAngleToTarget(playerScreenPosition, position, canvasTransform.sizeDelta * initalPosition);
+        // 可動領域に対する位置を-1～1に納めてDOTSsystemに渡す
+        var angleSign = Mathf.Sign(position.x - screenCenter.x);
+        var angleStrength = Mathf.InverseLerp
+        (
+            0,
+            screenHalfSize.x - crosshairSize.x,
+            Mathf.Abs(position.x - screenCenter.x)
+        );
 
-        demoObject.transform.rotation = Quaternion.Euler(0, crosshairConverter.UIToWorldAngle(position), 0);
+        crosshairConverter.SetAngle(angleStrength * angleSign);
     }
 
     public float GetAngleToTarget(Vector2 playerPosition, Vector2 targetPosition, Vector2 referencePoint)

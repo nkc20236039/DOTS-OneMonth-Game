@@ -1073,7 +1073,7 @@ MonoBehaviour:
     type: 3}
   shotInterval: 0.1
   muzzleOffset: {x: 2.27, y: -0.16}
-  angle: 0.65
+  maxAngle: 26
 --- !u!1001 &873675629
 PrefabInstance:
   m_ObjectHideFlags: 0

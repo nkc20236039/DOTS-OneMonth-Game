@@ -69,12 +69,19 @@ namespace DOTS
             var position = transform.Position + offsetDirection;
             position.y += pistol.Offset.y;
 
+            // 角度を計算
+            var angleStrengthSign = math.sign(targetPoint.TargetAngle);
+            var angleStrengthAbs = math.abs(targetPoint.TargetAngle);
+
+            var angle = math.lerp(0, math.radians(pistol.MaxAngle), angleStrengthAbs) * angleStrengthSign;
+            UnityEngine.Debug.Log(angle);
+
             // 位置を書き換え
             ParallelEcb.SetComponent(index, bullet, new LocalTransform
             {
                 Position = position,
                 Scale = 1,
-                Rotation = math.mul(transform.Rotation, quaternion.Euler(0, targetPoint.TargetAngle, 0))
+                Rotation = math.mul(transform.Rotation, quaternion.Euler(0, angle, 0))
             });
 
             ParallelEcb.AddComponent(index, bullet, new BulletComponent
