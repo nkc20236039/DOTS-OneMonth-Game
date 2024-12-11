@@ -10,6 +10,8 @@ namespace Mono
         [SerializeField]
         private float propulsionPower;  // 推進力
         [SerializeField]
+        private float pitchRotation;
+        [SerializeField]
         private float rotationSpeed; // 回転の速度
         [SerializeField]
         private float avoidPower;   // 回避力
@@ -34,6 +36,7 @@ namespace Mono
                 {
                     PropulsionPower = authoring.propulsionPower,
                     RotationSpeed = authoring.rotationSpeed,
+                    PitchRotation = authoring.pitchRotation,
                 });
                 // 回避を追加
                 AddComponent(player, new AvoidComponent

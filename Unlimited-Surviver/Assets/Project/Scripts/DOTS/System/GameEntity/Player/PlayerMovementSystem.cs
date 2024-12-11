@@ -1,4 +1,5 @@
-﻿using Unity.Burst;
+﻿using DOTStoMono;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -72,6 +73,7 @@ namespace DOTS
             ref PhysicsVelocity velocity,
             ref PhysicsMass mass,
             in PlayerInputComponent playerInput,
+            in TargetPointComponent targetPoint,
             in DynamicBuffer<Child> children)
         {
             // 物理の回転を固定
@@ -79,6 +81,8 @@ namespace DOTS
             // オブジェクト基準の方向を取得
             float3 forward = math.forward(transform.Rotation);
             float3 right = math.mul(transform.Rotation, new float3(1, 0, 0));
+
+            transform.Rotation = math.mul(transform.Rotation, quaternion.Euler(Player.PitchRotation * -targetPoint.Pitch, 0, 0));
 
             // 移動をしていなければ処理をしない
             if (math.distancesq(float2.zero, playerInput.MoveDirection) == 0)

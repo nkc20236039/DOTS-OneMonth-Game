@@ -7,5 +7,6 @@ namespace DOTS
     {
         public float PropulsionPower;
         public float RotationSpeed;
+        public float PitchRotation;
     }
 }

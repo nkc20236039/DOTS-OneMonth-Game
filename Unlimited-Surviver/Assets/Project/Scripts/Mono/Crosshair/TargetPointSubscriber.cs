@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace Mono
 {
-    public class CrosshairTargetConverter
+    public class TargetPointSubscriber
     {
         private EntityManager entityManager;
         private Entity player;
-        public CrosshairTargetConverter()
+        public TargetPointSubscriber()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
@@ -21,11 +21,13 @@ namespace Mono
                 .GetSingletonEntity();
         }
 
-        public void SetAngle(float angle)
+        public void SetSignedTargetRatio(float control, float pitch)
         {
-            var targetPoint = entityManager.GetComponentData<TargetPointComponent>(player);
-            targetPoint.TargetAngle = angle;
-            entityManager.SetComponentData(player, targetPoint);
+            entityManager.SetComponentData(player, new TargetPointComponent
+            {
+                TargetAngle = control,
+                Pitch = pitch,
+            });
         }
     }
 }

@@ -74,8 +74,7 @@ namespace DOTS
             var angleStrengthAbs = math.abs(targetPoint.TargetAngle);
 
             var angle = math.lerp(0, math.radians(pistol.MaxAngle), angleStrengthAbs) * angleStrengthSign;
-            UnityEngine.Debug.Log(angle);
-
+            
             // 位置を書き換え
             ParallelEcb.SetComponent(index, bullet, new LocalTransform
             {

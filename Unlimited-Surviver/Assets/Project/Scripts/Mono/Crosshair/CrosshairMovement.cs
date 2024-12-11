@@ -22,13 +22,13 @@ public class CrosshairMovement : MonoBehaviour
     private RectTransform canvasTransform;
     private Vector2 screenMaxSize;
     private Vector2 screenCenter;
-    private CrosshairTargetConverter crosshairConverter;
+    private TargetPointSubscriber targetPointSubscriber;
 
     void Start()
     {
         SetMovableSize();
-        CrosshairPositionInitalize();
-        crosshairConverter = new CrosshairTargetConverter();
+        CrosshairPositionInitalize(true);
+        targetPointSubscriber = new TargetPointSubscriber();
         // InputSystemの準備
         inputAction = new();
 
@@ -49,14 +49,13 @@ public class CrosshairMovement : MonoBehaviour
         if (Time.timeScale == 0) { return; }
 
         // 現在の位置とマウス移動量を取得
-        Vector3 position = crosshairTransform.position;
+        var position = crosshairTransform.position;
         Vector3 delta = context.ReadValue<Vector2>();
-        delta.y = 0;
         position += delta;
 
         // 画面内に制限
-        Vector2 crosshairSize = crosshairTransform.sizeDelta * 0.5f;
-        Vector2 screenHalfSize = screenMaxSize * 0.5f;
+        var crosshairSize = crosshairTransform.sizeDelta * 0.5f;
+        var screenHalfSize = screenMaxSize * 0.5f;
 
         // 制限をかける
         position.x = Mathf.Max(screenCenter.x - screenHalfSize.x + crosshairSize.x, position.x);
@@ -66,49 +65,42 @@ public class CrosshairMovement : MonoBehaviour
 
         crosshairTransform.position = position;
 
-        // 可動領域に対する位置を-1～1に納めてDOTSsystemに渡す
-        var angleSign = Mathf.Sign(position.x - screenCenter.x);
-        var angleStrength = Mathf.InverseLerp
+        // 左右の可動領域に対する位置を-1～1に収める
+        var xPositionSign = Mathf.Sign(position.x - screenCenter.x);
+        var xPositionRatio = Mathf.InverseLerp
         (
             0,
             screenHalfSize.x - crosshairSize.x,
             Mathf.Abs(position.x - screenCenter.x)
         );
+        var xSignedPositionRatio = xPositionRatio * xPositionSign;
 
-        crosshairConverter.SetAngle(angleStrength * angleSign);
-    }
+        // 上下の稼働領域に対する位置を-1～1に収める
+        var yPositionSign = Mathf.Sign(position.y - screenCenter.y);
+        var yPositionRatio = Mathf.InverseLerp
+        (
+            0,
+            screenHalfSize.y - crosshairSize.y,
+            Mathf.Abs(position.y - screenCenter.y)
+        );
+        var pitchRatio = yPositionRatio * yPositionSign;
 
-    public float GetAngleToTarget(Vector2 playerPosition, Vector2 targetPosition, Vector2 referencePoint)
-    {
-        // ターゲットへのベクトルを計算
-        Vector2 directionToTarget = targetPosition - playerPosition;
-
-        // 基準点からプレイヤーへのベクトルを計算
-        Vector2 referenceToPlayer = playerPosition - referencePoint;
-
-        // Mathf.Atan2を使用して角度を計算（ラジアン）
-        float angle = Mathf.Atan2(referenceToPlayer.y, referenceToPlayer.x)
-                      - Mathf.Atan2(directionToTarget.y, directionToTarget.x);
-
-        // ラジアンを度に変換
-        float angleDegrees = angle * Mathf.Rad2Deg;
-
-        // 角度を0から360の範囲に正規化（時計回りが正）
-        angleDegrees = Mathf.Repeat(angleDegrees, 360);
-
-        return angleDegrees - 180;
+        // 標的を登録する
+        targetPointSubscriber.SetSignedTargetRatio(xSignedPositionRatio, pitchRatio);
     }
 
     private void OnCrosshairInitalize(InputAction.CallbackContext context)
     {
-        CrosshairPositionInitalize();
+        CrosshairPositionInitalize(false);
     }
 
-    private void CrosshairPositionInitalize()
+    private void CrosshairPositionInitalize(bool isInital)
     {
         // クロスヘアを初期位置へ戻す
         Vector2 screenPosition = canvasTransform.sizeDelta * initalPosition;
         crosshairTransform.position = screenPosition;
+        if (isInital) { return; }
+        targetPointSubscriber.SetSignedTargetRatio(0, 0);
     }
 
     private void SetMovableSize()
