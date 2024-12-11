@@ -21,7 +21,7 @@ public class CrosshairMovement : MonoBehaviour
     private PlayerInputAction inputAction;
     private RectTransform canvasTransform;
     private Vector2 screenMaxSize;
-    private Vector2 screenCenter;
+    private Vector2 crosshairCenter;
     private TargetPointSubscriber targetPointSubscriber;
 
     void Start()
@@ -58,30 +58,30 @@ public class CrosshairMovement : MonoBehaviour
         var screenHalfSize = screenMaxSize * 0.5f;
 
         // 制限をかける
-        position.x = Mathf.Max(screenCenter.x - screenHalfSize.x + crosshairSize.x, position.x);
-        position.x = Mathf.Min(screenCenter.x + screenHalfSize.x - crosshairSize.x, position.x);
-        position.y = Mathf.Max(screenCenter.y - screenHalfSize.y + crosshairSize.y, position.y);
-        position.y = Mathf.Min(screenCenter.y + screenHalfSize.y - crosshairSize.y, position.y);
+        position.x = Mathf.Max(crosshairCenter.x - screenHalfSize.x + crosshairSize.x, position.x);
+        position.x = Mathf.Min(crosshairCenter.x + screenHalfSize.x - crosshairSize.x, position.x);
+        position.y = Mathf.Max(crosshairCenter.y - screenHalfSize.y + crosshairSize.y, position.y);
+        position.y = Mathf.Min(crosshairCenter.y + screenHalfSize.y - crosshairSize.y, position.y);
 
         crosshairTransform.position = position;
 
         // 左右の可動領域に対する位置を-1～1に収める
-        var xPositionSign = Mathf.Sign(position.x - screenCenter.x);
+        var xPositionSign = Mathf.Sign(position.x - crosshairCenter.x);
         var xPositionRatio = Mathf.InverseLerp
         (
             0,
             screenHalfSize.x - crosshairSize.x,
-            Mathf.Abs(position.x - screenCenter.x)
+            Mathf.Abs(position.x - crosshairCenter.x)
         );
         var xSignedPositionRatio = xPositionRatio * xPositionSign;
 
         // 上下の稼働領域に対する位置を-1～1に収める
-        var yPositionSign = Mathf.Sign(position.y - screenCenter.y);
+        var yPositionSign = Mathf.Sign(position.y - crosshairCenter.y);
         var yPositionRatio = Mathf.InverseLerp
         (
             0,
             screenHalfSize.y - crosshairSize.y,
-            Mathf.Abs(position.y - screenCenter.y)
+            Mathf.Abs(position.y - crosshairCenter.y)
         );
         var pitchRatio = yPositionRatio * yPositionSign;
 
@@ -98,7 +98,7 @@ public class CrosshairMovement : MonoBehaviour
     {
         // クロスヘアを初期位置へ戻す
         Vector2 screenPosition = canvasTransform.sizeDelta * initalPosition;
-        crosshairTransform.position = screenPosition;
+        crosshairTransform.position = crosshairCenter;
         if (isInital) { return; }
         targetPointSubscriber.SetSignedTargetRatio(0, 0);
     }
@@ -111,7 +111,7 @@ public class CrosshairMovement : MonoBehaviour
         }
 
         screenMaxSize = canvasTransform.sizeDelta * limitRangeMove;
-        screenCenter = canvasTransform.sizeDelta * 0.5f;
+        crosshairCenter = canvasTransform.sizeDelta * initalPosition;
     }
 
 #if UNITY_EDITOR
@@ -129,7 +129,7 @@ public class CrosshairMovement : MonoBehaviour
         SetMovableSize();
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(screenCenter, screenMaxSize);
+        Gizmos.DrawWireCube(crosshairCenter, screenMaxSize);
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(canvasTransform.sizeDelta * initalPosition, 10);
     }

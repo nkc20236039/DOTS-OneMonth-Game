@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enhancementType: 2
   isAwake: 1
-  firstValue: 0.1
+  firstValue: 0.25
   calculationType: 2
   enhancementValue: -5
   enhancementTitle: "\u767A\u5C04\u901F\u5EA6UP"
