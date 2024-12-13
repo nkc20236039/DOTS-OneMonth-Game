@@ -21,12 +21,14 @@ namespace Mono
                 .GetSingletonEntity();
         }
 
-        public void SetSignedTargetRatio(float control, float pitch)
+        public void SetSignedTargetRatio(float control, float pitch, Vector3 targetPosition, Vector3 targetDirection)
         {
             entityManager.SetComponentData(player, new TargetPointComponent
             {
                 TargetAngle = control,
                 Pitch = pitch,
+                TargetPosition = targetPosition,
+                TargetDirection = targetDirection,
             });
         }
     }

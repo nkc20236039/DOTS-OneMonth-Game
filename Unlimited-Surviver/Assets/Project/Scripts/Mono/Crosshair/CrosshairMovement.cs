@@ -85,8 +85,16 @@ public class CrosshairMovement : MonoBehaviour
         );
         var pitchRatio = yPositionRatio * yPositionSign;
 
+        var targetRay = viewCamera.ScreenPointToRay(position);
+
         // 標的を登録する
-        targetPointSubscriber.SetSignedTargetRatio(xSignedPositionRatio, pitchRatio);
+        targetPointSubscriber.SetSignedTargetRatio
+        (
+            xSignedPositionRatio,
+            pitchRatio,
+            targetRay.origin,
+            targetRay.direction
+        );
     }
 
     private void OnCrosshairInitalize(InputAction.CallbackContext context)
@@ -100,7 +108,8 @@ public class CrosshairMovement : MonoBehaviour
         Vector2 screenPosition = canvasTransform.sizeDelta * initalPosition;
         crosshairTransform.position = crosshairCenter;
         if (isInital) { return; }
-        targetPointSubscriber.SetSignedTargetRatio(0, 0);
+        var targetRay = viewCamera.ScreenPointToRay(crosshairCenter);
+        targetPointSubscriber.SetSignedTargetRatio(0, 0, targetRay.origin, targetRay.direction);
     }
 
     private void SetMovableSize()

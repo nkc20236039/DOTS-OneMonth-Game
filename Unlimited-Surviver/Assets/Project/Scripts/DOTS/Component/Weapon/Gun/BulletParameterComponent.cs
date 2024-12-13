@@ -15,6 +15,7 @@ namespace DOTS
 
     public struct BulletComponent : IComponentData
     {
-        public Entity Owner;   // この弾を撃った生存しているエンティティ
+        public Entity Owner;    // この弾を撃ったエンティティ
+        public Entity Target;   // 
     }
 }

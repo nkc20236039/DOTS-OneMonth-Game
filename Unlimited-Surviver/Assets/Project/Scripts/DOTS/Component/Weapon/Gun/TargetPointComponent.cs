@@ -7,5 +7,7 @@ namespace DOTStoMono
     {
         public float TargetAngle;
         public float Pitch;
+        public float3 TargetPosition;
+        public float3 TargetDirection;
     }
 }

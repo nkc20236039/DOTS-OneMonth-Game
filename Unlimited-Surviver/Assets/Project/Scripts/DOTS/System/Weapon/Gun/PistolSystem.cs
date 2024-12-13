@@ -3,7 +3,9 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
+using UnityEngine.Windows.Speech;
 
 namespace DOTS
 {
@@ -25,6 +27,7 @@ namespace DOTS
             // ECBの準備
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            var physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
 
             // 発射間隔の取得
             var shotInterval = EnhancemetTypeCollection
@@ -37,17 +40,22 @@ namespace DOTS
                 ShotInterval = shotInterval.Value,
                 ElapsedTime = (float)SystemAPI.Time.ElapsedTime,
                 ParallelEcb = ecb.AsParallelWriter(),
+                PhysicsWorld = physicsWorldSingleton.PhysicsWorld,
             }.ScheduleParallel(state.Dependency);
 
             state.Dependency.Complete();
         }
     }
 
+    [BurstCompile]
     public partial struct PistolJob : IJobEntity
     {
+        private const int HIT_FILTER = 1 << 1;  // Raycastがヒットするレイヤー
+
         public float ElapsedTime;
         public float ShotInterval;
         public EntityCommandBuffer.ParallelWriter ParallelEcb;
+        [ReadOnly] public PhysicsWorld PhysicsWorld;
 
         private void Execute(
             [EntityIndexInQuery] int index,
@@ -74,7 +82,7 @@ namespace DOTS
             var angleStrengthAbs = math.abs(targetPoint.TargetAngle);
 
             var angle = math.lerp(0, math.radians(pistol.MaxAngle), angleStrengthAbs) * angleStrengthSign;
-            
+
             // 位置を書き換え
             ParallelEcb.SetComponent(index, bullet, new LocalTransform
             {
@@ -86,11 +94,38 @@ namespace DOTS
             ParallelEcb.AddComponent(index, bullet, new BulletComponent
             {
                 // 親になっている(プレイヤー想定)エンティティを取得
-                Owner = entity
+                Owner = entity,
+                Target = Raycast(targetPoint.TargetPosition, targetPoint.TargetDirection),
             });
 
             // 次の発射時間を指定
             pistol.NextShot = ElapsedTime + ShotInterval;
+        }
+
+        private Entity Raycast(float3 position, float3 direction)
+        {
+            var filter = new CollisionFilter
+            {
+                GroupIndex = 0,
+                BelongsTo = ~0u,
+                CollidesWith = HIT_FILTER,
+            };
+
+            var rayInput = new RaycastInput
+            {
+                Start = position,
+                End = direction * 10000,
+                Filter = CollisionFilter.Default,
+            };
+
+            if (PhysicsWorld.CastRay(rayInput, out var hitInfo))
+            {
+                return hitInfo.Entity;
+            }
+            else
+            {
+                return Entity.Null;
+            }
         }
     }
 }

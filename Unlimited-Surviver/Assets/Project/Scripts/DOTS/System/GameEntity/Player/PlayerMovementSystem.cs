@@ -22,7 +22,8 @@ namespace DOTS
                     PhysicsVelocity,
                     PlayerInputComponent,
                     PlayerSingleton,
-                    EnhancementBuffer>().Build();
+                    EnhancementBuffer>()
+                .Build();
 
             state.RequireForUpdate(queryBuilder);
         }
@@ -46,6 +47,7 @@ namespace DOTS
             {
                 Player = SystemAPI.GetSingleton<PlayerSingleton>(),
                 Speed = speed.Value,
+                DeltaTime = SystemAPI.Time.DeltaTime,
                 ParallelEcb = ecb.AsParallelWriter(),
                 FighterTiltGroup = SystemAPI.GetComponentLookup<FighterTiltComponent>(true)
             }.ScheduleParallel(state.Dependency);
@@ -62,6 +64,7 @@ namespace DOTS
     {
         [ReadOnly] public PlayerSingleton Player;
         [ReadOnly] public float Speed;
+        [ReadOnly] public float DeltaTime;
         [ReadOnly] public ComponentLookup<FighterTiltComponent> FighterTiltGroup;
         public EntityCommandBuffer.ParallelWriter ParallelEcb;
 
@@ -82,7 +85,11 @@ namespace DOTS
             float3 forward = math.forward(transform.Rotation);
             float3 right = math.mul(transform.Rotation, new float3(1, 0, 0));
 
-            transform.Rotation = math.mul(transform.Rotation, quaternion.Euler(Player.PitchRotation * -targetPoint.Pitch, 0, 0));
+            transform.Rotation = math.mul
+            (
+                transform.Rotation,
+                quaternion.Euler(Player.PitchRotation * -targetPoint.Pitch * DeltaTime, 0, 0)
+            );
 
             // 移動をしていなければ処理をしない
             if (math.distancesq(float2.zero, playerInput.MoveDirection) == 0)
@@ -141,7 +148,7 @@ namespace DOTS
                 (
                     currentRotation,
                     lookRotation,
-                    Player.RotationSpeed
+                    Player.RotationSpeed * DeltaTime
                 );
         }
     }

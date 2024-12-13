@@ -1,4 +1,4 @@
-using Unity.Burst;
+ï»¿using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -11,7 +11,7 @@ namespace DOTS
     {
         void ISystem.OnCreate(ref Unity.Entities.SystemState state)
         {
-            // ¢Š«‚·‚éğŒ‚ª®‚Á‚Ä‚¢‚éƒGƒ“ƒeƒBƒeƒB‚Ì‚İ‚Éˆ—
+            // å¬å–šã™ã‚‹æ¡ä»¶ãŒæ•´ã£ã¦ã„ã‚‹ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã®ã¿ã«å‡¦ç†
             var requireQuery = SystemAPI.QueryBuilder()
                 .WithAll<EnemyHomingComponent, LocalTransform, PhysicsVelocity>()
                 .Build();
@@ -40,18 +40,16 @@ namespace DOTS
             ref LocalTransform transform,
             ref PhysicsVelocity velocity)
         {
-            // Œ»İ‚Ì•ûŒü‚ğæ“¾
-            // ƒvƒŒƒCƒ„[‚Ì•ûŒü‚ğæ“¾
+            // ç¾åœ¨ã®æ–¹å‘ã‚’å–å¾—
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘ã‚’å–å¾—
             float3 targetDirection = math.normalize(PlayerPositon - transform.Position);
-            targetDirection.y = 0f;
             quaternion targetRotate = quaternion.LookRotationSafe(targetDirection, math.up());
 
-            // ‹È‚ª‚éŠp“x‚ğŠm’è‚·‚é(ƒz[ƒ~ƒ“ƒO)
+            // æ›²ãŒã‚‹è§’åº¦ã‚’ç¢ºå®šã™ã‚‹(ãƒ›ãƒ¼ãƒŸãƒ³ã‚°)
             quaternion direction = math.slerp(transform.Rotation, targetRotate, enemy.HomingAccuracy);
 
             transform.Rotation = direction;
             velocity.Linear = transform.Forward() * enemy.Speed;
-            transform.Position.y = 0;
         }
     }
 }

@@ -9,10 +9,10 @@ EditorBuildSettings:
     path: Assets/Project/Scenes/MainScenes/TitleScene.unity
     guid: 028194c15b1fc094b8453394d3d1f09a
   - enabled: 1
-    path: Assets/Project/Scenes/DemoScene.unity
+    path: Assets/Project/Scenes/DemoScenes/DemoScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Project/Scenes/DemoScenes/SubDemoScene.unity
+    path: Assets/Project/Scenes/DemoScenes/DemoScene/SubDemoScene.unity
     guid: 2b90e1daa6cc40040b5c833294ba9ff6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 27bf67ae1b1a77445831693a0038bac3,
