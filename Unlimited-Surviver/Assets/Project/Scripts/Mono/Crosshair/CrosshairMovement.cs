@@ -1,6 +1,7 @@
 ﻿using Mono;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Canvas))]
 public class CrosshairMovement : MonoBehaviour
@@ -43,9 +44,13 @@ public class CrosshairMovement : MonoBehaviour
         Cursor.visible = false;
     }
 
+    /// <summary>
+    /// InputSystemのマウス移動にて呼び出し
+    /// </summary>
+    /// <param name="context"></param>
     private void Look(InputAction.CallbackContext context)
     {
-        // 時間が停止していたらこのメソッドの処理をしない
+        // 時間が停止していたら処理をしない
         if (Time.timeScale == 0) { return; }
 
         // 現在の位置とマウス移動量を取得
@@ -65,43 +70,49 @@ public class CrosshairMovement : MonoBehaviour
 
         crosshairTransform.position = position;
 
-        // 左右の可動領域に対する位置を-1～1に収める
-        var xPositionSign = Mathf.Sign(position.x - crosshairCenter.x);
-        var xPositionRatio = Mathf.InverseLerp
-        (
-            0,
-            screenHalfSize.x - crosshairSize.x,
-            Mathf.Abs(position.x - crosshairCenter.x)
-        );
-        var xSignedPositionRatio = xPositionRatio * xPositionSign;
-
-        // 上下の稼働領域に対する位置を-1～1に収める
-        var yPositionSign = Mathf.Sign(position.y - crosshairCenter.y);
-        var yPositionRatio = Mathf.InverseLerp
-        (
-            0,
-            screenHalfSize.y - crosshairSize.y,
-            Mathf.Abs(position.y - crosshairCenter.y)
-        );
-        var pitchRatio = yPositionRatio * yPositionSign;
-
+        var signedAngleRatio = GetScreenRatio(position.x, crosshairCenter.x, screenHalfSize.x, crosshairSize.x);
+        var pitchRatio = GetScreenRatio(position.y, crosshairCenter.y, screenHalfSize.y, crosshairSize.y);
         var targetRay = viewCamera.ScreenPointToRay(position);
 
         // 標的を登録する
         targetPointSubscriber.SetSignedTargetRatio
         (
-            xSignedPositionRatio,
+            signedAngleRatio,
             pitchRatio,
             targetRay.origin,
             targetRay.direction
         );
     }
 
+    /// <summary>
+    /// 画面に対する位置の割合を取得する
+    /// </summary>
+    private float GetScreenRatio(float position, float center, float halfSize, float crosshairSize)
+    {
+        // 符号を取り出し
+        var positionSign = Mathf.Sign(position - center);
+        // 割合いを取得
+        var positionRatio = Mathf.InverseLerp
+        (
+            0,
+            halfSize - crosshairSize,
+            Mathf.Abs(position - center)
+        );
+        // 符号付きの割合いを返却
+        return positionRatio * positionSign;
+    }
+
+    /// <summary>
+    /// InputSystemのマウス中央ボタンにて呼び出し
+    /// </summary>
     private void OnCrosshairInitalize(InputAction.CallbackContext context)
     {
         CrosshairPositionInitalize(false);
     }
 
+    /// <summary>
+    /// クロスヘアの位置を初期位置へ戻す
+    /// </summary>
     private void CrosshairPositionInitalize(bool isInital)
     {
         // クロスヘアを初期位置へ戻す
@@ -112,6 +123,9 @@ public class CrosshairMovement : MonoBehaviour
         targetPointSubscriber.SetSignedTargetRatio(0, 0, targetRay.origin, targetRay.direction);
     }
 
+    /// <summary>
+    /// スクリーン上の可動範囲と中心を設定する
+    /// </summary>
     private void SetMovableSize()
     {
         if (canvasTransform == null)
@@ -123,6 +137,7 @@ public class CrosshairMovement : MonoBehaviour
         crosshairCenter = canvasTransform.sizeDelta * initalPosition;
     }
 
+    /* これ以降はEditor専用 */
 #if UNITY_EDITOR
     private void OnValidate()
     {
