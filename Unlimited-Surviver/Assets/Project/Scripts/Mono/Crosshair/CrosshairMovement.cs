@@ -1,7 +1,6 @@
 ﻿using Mono;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Canvas))]
 public class CrosshairMovement : MonoBehaviour
